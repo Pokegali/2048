@@ -4,10 +4,6 @@
 #include <vector>
 
 namespace game2048 {
-	static bool is_valid(const Coordinates& coordinates) {
-		return coordinates.first < MAX_SIZE && coordinates.second < MAX_SIZE;
-	}
-
 	typedef struct MoveResult {
 		unsigned int score;
 		bool has_moved;
@@ -65,23 +61,23 @@ Game::Game() {
 	for (uint8_t i = 0; i < CELLS_AT_START; i++) { this->spawn_number(); }
 }
 
-Coordinates Game::get_random_empty_cell() {
-	std::vector<Coordinates> empty_cells;
-	for (uint8_t i = 0; i < MAX_SIZE; i++) {
-		for (uint8_t j = 0; j < MAX_SIZE; j++) {
-			if (this->board[i][j] == 0) {
-				empty_cells.emplace_back(j, i);
+uint8_t* Game::get_random_empty_cell() {
+	std::vector<uint8_t*> empty_cells;
+	for (Line& line: this->board) {
+		for (uint8_t& element: line) {
+			if (element == 0) {
+				empty_cells.emplace_back(&element);
 			}
 		}
 	}
-	if (empty_cells.empty()) { return {-1, -1}; }
+	if (empty_cells.empty()) { return nullptr; }
 	return empty_cells[this->random.get_long(empty_cells.size())];
 }
 
 int Game::spawn_number() {
-	Coordinates cell = this->get_random_empty_cell();
-	if (!is_valid(cell)) { return 1; }
-	this->board[cell.second][cell.first] = this->random.get_success(SPAWN_CHANCE_4) ? 2 : 1;
+	uint8_t* cell = this->get_random_empty_cell();
+	if (cell == nullptr) { return 1; }
+	*cell = this->random.get_success(SPAWN_CHANCE_4) ? 2 : 1;
 	return 0;
 }
 

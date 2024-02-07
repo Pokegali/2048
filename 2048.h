@@ -39,7 +39,7 @@ namespace game2048 {
 		Random random = Random();
 		unsigned int score = 0;
 
-		Coordinates get_random_empty_cell();
+		uint8_t* get_random_empty_cell();
 		int spawn_number();
 		bool move_left();
 		void rotate();
