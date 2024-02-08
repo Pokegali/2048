@@ -11,7 +11,6 @@ namespace game2048 {
 
 	typedef std::array<uint8_t, MAX_SIZE> Line;
 	typedef std::array<Line, MAX_SIZE> Board;
-	typedef std::pair<uint8_t, uint8_t> Coordinates; // (x, y)
 	enum class Direction { up, right, down, left };
 
 	class Random {
@@ -35,8 +34,8 @@ namespace game2048 {
 		void reset();
 
 	private:
-		Board board = Board();
-		Random random = Random();
+		Board board {};
+		Random random {};
 		unsigned int score = 0;
 
 		uint8_t* get_random_empty_cell();

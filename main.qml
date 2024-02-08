@@ -29,13 +29,26 @@ Window {
 
         Keys.onPressed: event => {
             switch (event.key) {
-                case Qt.Key_Down: GameController.move(2); break;
-                case Qt.Key_Left: GameController.move(3); break;
-                case Qt.Key_Right: GameController.move(1); break;
-                case Qt.Key_Up: GameController.move(0); break;
-                default: break;
+            case Qt.Key_Down:
+                GameController.move(2);
+                break;
+            case Qt.Key_Left:
+                GameController.move(3);
+                break;
+            case Qt.Key_Right:
+                GameController.move(1);
+                break;
+            case Qt.Key_Up:
+                GameController.move(0);
+                break;
+            default:
+                break;
             }
-            if (!GameController.canMove()) { shadow.visible = true; }
+            if (!GameController.canMove() && GameController.inGame) {
+                shadow.visible = true;
+                GameController.inGame = false;
+                endDialog.open();
+            }
         }
 
         RowLayout {
@@ -94,7 +107,7 @@ Window {
                         anchors.horizontalCenter: parent.horizontalCenter
                         anchors.top: bestScoreLabel.bottom
                         font.pointSize: 15
-                        text: GameController.bestScore.toLocaleString(Qt.locale("fr_FR"), "f", 0)
+                        text: SaveController.bestScore.toLocaleString(Qt.locale("fr_FR"), "f", 0)
                     }
                 }
                 Button {
@@ -185,10 +198,10 @@ Window {
             }
             Rectangle {
                 id: shadow
-                visible: false
                 anchors.fill: parent
                 color: "#66ffffff"
                 radius: 10
+                visible: false
                 z: 1
             }
         }
@@ -200,17 +213,6 @@ Window {
         focus: true
         modal: true
         padding: 40
-
-        onAboutToShow: {
-            shadow.visible = true
-            resetDialogText.text = GameController.canMove() ? "Your progress will be lost. Are you sure?" : "Do you want to start again?"
-        }
-        onClosed: {
-            if (GameController.canMove()) {
-                shadow.visible = false;
-                mainColumn.forceActiveFocus();
-            }
-        }
 
         contentItem: Column {
             anchors.centerIn: parent
@@ -227,20 +229,87 @@ Window {
                 Button {
                     text: "No"
 
-                    onClicked: resetDialog.close();
+                    onClicked: resetDialog.close()
                 }
                 Button {
                     text: "Yes"
 
                     onClicked: {
                         GameController.reset();
+                        GameController.inGame = true;
                         resetDialog.close();
                     }
                 }
             }
         }
-    }
 
+        onAboutToShow: {
+            shadow.visible = true;
+            resetDialogText.text = GameController.canMove() ? "Your progress will be lost. Are you sure?" : "Do you want to start again?";
+        }
+        onClosed: {
+            if (GameController.canMove()) {
+                shadow.visible = false;
+                mainColumn.forceActiveFocus();
+            }
+        }
+    }
+    Popup {
+        id: endDialog
+        anchors.centerIn: parent
+        closePolicy: Popup.NoAutoClose
+        focus: true
+        modal: true
+        padding: 40
+
+        contentItem: Column {
+            anchors.centerIn: parent
+            spacing: 10
+
+            Text {
+                anchors.horizontalCenter: parent.horizontalCenter
+                color: "white"
+                horizontalAlignment: Text.AlignHCenter
+                text: `End of game! Your score is ${GameController.score.toLocaleString(Qt.locale("fr_FR"), "f", 0)}.\nEnter a username if you wish to save your score.`
+            }
+            Rectangle {
+                anchors.horizontalCenter: parent.horizontalCenter
+                height: 40
+                width: usernameInput.implicitWidth + 1
+                color: "#00000000"
+
+                TextInput {
+                    id: usernameInput
+                    anchors.centerIn: parent
+                    autoScroll: false
+                    color: "white"
+                    focus: true
+                    activeFocusOnTab: true
+                    maximumLength: 30
+
+                    validator: RegularExpressionValidator {
+                        regularExpression: /.{3,30}/
+                    }
+                }
+            }
+            Button {
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: "Save"
+
+                onClicked: {
+                    if (!usernameInput.acceptableInput) { return; }
+                    SaveController.registerScore(usernameInput.text, GameController.score)
+                    endDialog.close();
+                }
+            }
+            Button {
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: "Don't save"
+
+                onClicked: endDialog.close()
+            }
+        }
+    }
     Popup {
         id: undoDialog
         anchors.centerIn: parent
@@ -249,26 +318,26 @@ Window {
         modal: true
         padding: 40
 
-        onAboutToShow: shadow.visible = true
-        onClosed: {
-            if (GameController.canMove()) {
-                shadow.visible = false;
-                mainColumn.forceActiveFocus();
-            }
-        }
-
         contentItem: Column {
             spacing: 10
 
             Text {
-                text: "No, you can't cheat! It's bad."
                 color: "white"
+                text: "No, you can't cheat! It's bad."
             }
             Button {
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: "Ok"
 
                 onClicked: undoDialog.close()
+            }
+        }
+
+        onAboutToShow: shadow.visible = true
+        onClosed: {
+            if (GameController.canMove()) {
+                shadow.visible = false;
+                mainColumn.forceActiveFocus();
             }
         }
     }

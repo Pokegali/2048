@@ -15,8 +15,10 @@ qt_add_qml_module(${APP_EXE}
         URI gameModule
         VERSION 1.0
         SOURCES
-        gamecontroller.cpp
-        gamecontroller.h
+            GameController.cpp
+            GameController.h
+            SaveController.cpp
+            SaveController.h
         QML_FILES
             main.qml
 )

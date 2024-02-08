@@ -11,31 +11,27 @@ class GameController: public QObject {
 	QML_SINGLETON
 
 	Q_PROPERTY(quint32 score READ getScore NOTIFY scoreChanged)
-	Q_PROPERTY(quint32 bestScore READ getBestScore WRITE setBestScore NOTIFY bestScoreChanged)
 	Q_PROPERTY(QList<quint8> board READ getBoard NOTIFY boardChanged)
+	Q_PROPERTY(bool inGame READ isInGame WRITE setInGame NOTIFY inGameChanged)
 
 public:
 	explicit GameController(QObject* parent = nullptr);
-	quint32 getScore();
-	quint32 getBestScore();
-	QList<quint8> getBoard();
-	void setBestScore(const quint32& bestScore);
-
-public slots:
-	void move(int towards);
-	void reset();
-	bool canMove();
-
+	quint32 getScore() const;
+	QList<quint8> getBoard() const;
+	bool isInGame() const;
+	void setInGame(bool);
+	Q_INVOKABLE void move(quint8 towards);
+	Q_INVOKABLE void reset();
+	Q_INVOKABLE bool canMove();
 
 signals:
 	void scoreChanged();
-	void bestScoreChanged();
 	void boardChanged();
+	void inGameChanged();
 
 private:
 	game2048::Game game {};
-
-	void updateScore();
+	bool inGame = true;
 };
 
 
