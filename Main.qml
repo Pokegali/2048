@@ -5,27 +5,49 @@ import gameModule
 
 Window {
     id: root
+
     function getColor(x) {
-        return "#" + ((Math.max(0, 255 - 51 * (x - 1)) << 16) + (255 << 8) + Math.max(0, (x - 1) * 51 - 255)).toString(16).padStart(6, "0");
+        return Qt.hsva(x * 5 / 132 + 1 / 12, 1, 1);
     }
     function showNumber(x) {
         return x === 0 ? "" : String(1 << x);
     }
 
-    maximumHeight: 500
-    maximumWidth: 500
-    minimumHeight: 500
+    maximumHeight: minimumHeight
+    maximumWidth: minimumWidth
+    minimumHeight: 520
     minimumWidth: 500
     title: "2048"
     visible: true
 
+    MenuBar {
+        id: menu
+        width: parent.width
+
+        Menu {
+            title: "Game"
+
+            Action {
+                text: "Best scores"
+            }
+            MenuSeparator {}
+            Action {
+                text: "Quit"
+                onTriggered: Qt.quit()
+            }
+        }
+    }
     ColumnLayout {
         id: mainColumn
-        anchors.centerIn: parent
+        anchors.bottom: parent.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: menu.bottom
+        anchors.margins: 10
         focus: true
-        height: root.height - 20
+        height: 500
         spacing: 25
-        width: root.width - 20
+        width: 500
 
         Keys.onPressed: event => {
             switch (event.key) {
@@ -257,7 +279,7 @@ Window {
     Popup {
         id: endDialog
         anchors.centerIn: parent
-        closePolicy: Popup.NoAutoClose
+        closePolicy: Popup.CloseOnEscape
         focus: true
         modal: true
         padding: 40
@@ -274,18 +296,22 @@ Window {
             }
             Rectangle {
                 anchors.horizontalCenter: parent.horizontalCenter
+                color: "#00000000"
                 height: 40
                 width: usernameInput.implicitWidth + 1
-                color: "#00000000"
 
                 TextInput {
                     id: usernameInput
+                    activeFocusOnTab: true
                     anchors.centerIn: parent
                     autoScroll: false
                     color: "white"
                     focus: true
-                    activeFocusOnTab: true
                     maximumLength: 30
+                    onAccepted: {
+                        SaveController.registerScore(usernameInput.text, GameController.score);
+                        endDialog.close();
+                    }
 
                     validator: RegularExpressionValidator {
                         regularExpression: /.{3,30}/
@@ -295,10 +321,13 @@ Window {
             Button {
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: "Save"
+                id: saveButton
 
                 onClicked: {
-                    if (!usernameInput.acceptableInput) { return; }
-                    SaveController.registerScore(usernameInput.text, GameController.score)
+                    if (!usernameInput.acceptableInput) {
+                        return;
+                    }
+                    SaveController.registerScore(usernameInput.text, GameController.score);
                     endDialog.close();
                 }
             }

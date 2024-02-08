@@ -20,7 +20,7 @@ qt_add_qml_module(${APP_EXE}
             SaveController.cpp
             SaveController.h
         QML_FILES
-            main.qml
+            Main.qml
 )
 target_link_libraries(${APP_EXE} PUBLIC g2048)
 target_link_libraries(${APP_EXE} PRIVATE Qt6::Quick)

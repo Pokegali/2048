@@ -19,7 +19,7 @@ void SaveController::loadData() {
 	}
 	this->settings.endArray();
 	if (size != 0) {
-		auto bestScoreIterator = std::max_element(this->scores.begin(), this->scores.end(), [](const ScoreRecord& record1, const ScoreRecord& record2) { return record1.score > record2.score; });
+		auto bestScoreIterator = std::max_element(this->scores.begin(), this->scores.end(), [](const ScoreRecord& record1, const ScoreRecord& record2) { return record1.score < record2.score; });
 		this->updateBestScore(*bestScoreIterator);
 	}
 }
@@ -46,7 +46,7 @@ void SaveController::registerScore(const QString& username, quint32 score) {
 
 quint32 SaveController::getBestScore() const {
 	if (this->scores.empty()) { return 0; }
-    return this->scores.first().score;
+    return this->bestScore.score;
 }
 
 void SaveController::updateBestScore(const ScoreRecord& record) {
