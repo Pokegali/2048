@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import Qt.labs.qmlmodels
 import gameModule
 
 Window {
@@ -29,10 +30,14 @@ Window {
 
             Action {
                 text: "Best scores"
+
+                onTriggered: scores.show()
             }
-            MenuSeparator {}
+            MenuSeparator {
+            }
             Action {
                 text: "Quit"
+
                 onTriggered: Qt.quit()
             }
         }
@@ -41,9 +46,9 @@ Window {
         id: mainColumn
         anchors.bottom: parent.bottom
         anchors.left: parent.left
+        anchors.margins: 10
         anchors.right: parent.right
         anchors.top: menu.bottom
-        anchors.margins: 10
         focus: true
         height: 500
         spacing: 25
@@ -308,20 +313,21 @@ Window {
                     color: "white"
                     focus: true
                     maximumLength: 30
-                    onAccepted: {
-                        SaveController.registerScore(usernameInput.text, GameController.score);
-                        endDialog.close();
-                    }
 
                     validator: RegularExpressionValidator {
                         regularExpression: /.{3,30}/
                     }
+
+                    onAccepted: {
+                        SaveController.registerScore(usernameInput.text, GameController.score);
+                        endDialog.close();
+                    }
                 }
             }
             Button {
+                id: saveButton
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: "Save"
-                id: saveButton
 
                 onClicked: {
                     if (!usernameInput.acceptableInput) {
@@ -367,6 +373,53 @@ Window {
             if (GameController.canMove()) {
                 shadow.visible = false;
                 mainColumn.forceActiveFocus();
+            }
+        }
+    }
+    Window {
+        id: scores
+
+        property int page: 0
+
+        maximumHeight: minimumHeight
+        maximumWidth: minimumWidth
+        minimumHeight: 450
+        minimumWidth: 360
+        title: "2048 | Best scores"
+
+        TableView {
+            anchors.margins: 20
+            anchors.fill: parent
+            clip: true
+            columnSpacing: 1
+            rowSpacing: 1
+
+            delegate: Rectangle {
+                border.width: 1
+                implicitHeight: 30
+                implicitWidth: 100
+
+                Text {
+                    anchors.centerIn: parent
+                    text: display
+                }
+            }
+            model: TableModel {
+                rows: SaveController.scores.slice(scores.page * 10, (scores.page + 1) * 10).map(x => ({
+                    "score": x.score.toLocaleString(Qt.locale("fr_FR"), "f", 0),
+                    "username": x.username,
+                    "date": x.date.toLocaleDateString("fr-FR")
+                }))
+
+                TableModelColumn {
+                    display: "score"
+                }
+                TableModelColumn {
+                    display: "username"
+                }
+                TableModelColumn {
+                    display: "date"
+                }
             }
         }
     }

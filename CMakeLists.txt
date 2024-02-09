@@ -5,7 +5,7 @@ add_compile_options(-O2 -pedantic -Wall -Wextra -Wcast-align -Wcast-qual -Wctor-
 
 add_library(g2048 STATIC 2048.cpp 2048.h)
 
-find_package(Qt6 6.4 REQUIRED COMPONENTS Quick)
+find_package(Qt6 REQUIRED COMPONENTS Quick)
 
 qt_standard_project_setup()
 set(APP_EXE game)

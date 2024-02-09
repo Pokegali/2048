@@ -6,11 +6,17 @@
 #include <QSettings>
 #include <qqml.h>
 
-struct ScoreRecord {
+typedef struct ScoreRecord {
+	Q_GADGET
+	Q_PROPERTY(QString username MEMBER username)
+	Q_PROPERTY(quint32 score MEMBER score)
+	Q_PROPERTY(QDate date MEMBER date)
+
+public:
 	QString username;
 	quint32 score;
 	QDate date;
-};
+} ScoreRecord;
 
 class SaveController: public QObject {
 	Q_OBJECT
@@ -18,16 +24,19 @@ class SaveController: public QObject {
 	QML_SINGLETON
 
 	Q_PROPERTY(quint32 bestScore READ getBestScore NOTIFY bestScoreChanged)
+	Q_PROPERTY(QList<ScoreRecord> scores READ getScores NOTIFY scoresChanged)
 
 public:
 	explicit SaveController(QObject* parent = nullptr);
 	void loadData();
 	void saveData();
 	quint32 getBestScore() const;
+	QList<ScoreRecord> getScores() const;
 	Q_INVOKABLE void registerScore(const QString& username, quint32 score);
 
 signals:
 	void bestScoreChanged();
+	void scoresChanged();
 
 private:
 	QSettings settings;

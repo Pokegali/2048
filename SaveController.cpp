@@ -40,6 +40,7 @@ void SaveController::registerScore(const QString& username, quint32 score) {
 	qDebug() << "Saving new score record: username" << username << "score" << score;
 	ScoreRecord record {username, score, QDate::currentDate()};
 	this->scores.append(record);
+	emit scoresChanged();
 	this->saveData();
 	this->updateBestScore(record);
 }
@@ -53,4 +54,10 @@ void SaveController::updateBestScore(const ScoreRecord& record) {
 	if (record.score < this->bestScore.score) { return; }
 	this->bestScore = record;
 	emit bestScoreChanged();
+}
+
+QList<ScoreRecord> SaveController::getScores() const {
+	QList<ScoreRecord> result = this->scores;
+	std::sort(result.begin(), result.end(), [](const ScoreRecord& record1, const ScoreRecord& record2) { return record1.score > record2.score; });
+	return result;
 }
