@@ -8,7 +8,7 @@ Window {
     id: root
 
     function getColor(x) {
-        return Qt.hsva(x * 5 / 132 + 1 / 12, 1, 1);
+        return Qt.hsva(x * 5 / 132 + 1 / 12, 1, 1, 1);
     }
     function showNumber(x) {
         return x === 0 ? "" : String(1 << x);
@@ -27,6 +27,7 @@ Window {
 
         Menu {
             title: "Game"
+            onClosed: mainColumn.forceActiveFocus()
 
             Action {
                 text: "Best scores"

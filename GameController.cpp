@@ -12,7 +12,7 @@ QList<T> listFromMatrix(const std::array<std::array<T, Size>, Size>& matrix) {
 }
 
 quint32 GameController::getScore() const { return this->game.get_score(); }
-QList<quint8> GameController::getBoard() const { return listFromMatrix<uint8_t, 4>(this->game.get_board()); }
+QList<quint8> GameController::getBoard() const { return listFromMatrix<uint8_t, game2048::MAX_SIZE>(this->game.get_board()); }
 bool GameController::isInGame() const { return this->inGame; }
 
 void GameController::setInGame(bool status) {

@@ -24,14 +24,14 @@ class SaveController: public QObject {
 	QML_SINGLETON
 
 	Q_PROPERTY(quint32 bestScore READ getBestScore NOTIFY bestScoreChanged)
-	Q_PROPERTY(QList<ScoreRecord> scores READ getScores NOTIFY scoresChanged)
+	Q_PROPERTY(QList<ScoreRecord> scores READ getSortedScores NOTIFY scoresChanged)
 
 public:
 	explicit SaveController(QObject* parent = nullptr);
 	void loadData();
 	void saveData();
 	quint32 getBestScore() const;
-	QList<ScoreRecord> getScores() const;
+	QList<ScoreRecord> getSortedScores() const;
 	Q_INVOKABLE void registerScore(const QString& username, quint32 score);
 
 signals:

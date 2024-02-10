@@ -56,7 +56,7 @@ void SaveController::updateBestScore(const ScoreRecord& record) {
 	emit bestScoreChanged();
 }
 
-QList<ScoreRecord> SaveController::getScores() const {
+QList<ScoreRecord> SaveController::getSortedScores() const {
 	QList<ScoreRecord> result = this->scores;
 	std::sort(result.begin(), result.end(), [](const ScoreRecord& record1, const ScoreRecord& record2) { return record1.score > record2.score; });
 	return result;
