@@ -79,16 +79,15 @@ Window {
             }
         }
 
-        RowLayout {
+        Row {
             id: firstRow
             Layout.fillWidth: true
-            Layout.maximumHeight: root.height / 4
-            Layout.preferredHeight: 100
+            Layout.minimumHeight: root.height / 4
             spacing: 15
 
             Rectangle {
-                Layout.fillHeight: true
-                Layout.preferredWidth: parent.height
+                height: parent.height
+                width: parent.height
                 color: "yellow"
                 radius: 20
 
@@ -99,8 +98,8 @@ Window {
                 }
             }
             GridLayout {
-                Layout.fillHeight: true
-                Layout.fillWidth: true
+                height: parent.height
+                width: parent.width - parent.height - 10
                 columns: 2
                 rows: 2
 
@@ -196,6 +195,20 @@ Window {
             color: "#b0b0b0"
             radius: 10
 
+            Repeater {
+                model: 16
+
+                Tile {
+                    required property int index
+
+                    x: gridSpaces.itemAt(index).x + 8
+                    y: gridSpaces.itemAt(index).y + 8
+                    z: 1
+                    width: gridSpaces.itemAt(index).width
+                    height: gridSpaces.itemAt(index).height
+                    number: GameController.board[index]
+                }
+            }
             GridLayout {
                 anchors.fill: parent
                 anchors.margins: 8
@@ -205,22 +218,14 @@ Window {
                 rows: 4
 
                 Repeater {
+                    id: gridSpaces
                     model: 16
 
                     Rectangle {
-                        required property int index
-
                         Layout.fillHeight: true
                         Layout.fillWidth: true
-                        color: GameController.board[index] ? root.getColor(GameController.board[index]) : "#a0a0a0"
+                        color: "#a0a0a0"
                         radius: 10
-
-                        Text {
-                            anchors.centerIn: parent
-                            font.bold: true
-                            font.pointSize: 15
-                            text: root.showNumber(GameController.board[index])
-                        }
                     }
                 }
             }
@@ -394,6 +399,8 @@ Window {
             clip: true
             columnSpacing: 1
             rowSpacing: 1
+            interactive: false
+            contentItem.anchors.horizontalCenter: horizontalCenter
 
             delegate: Rectangle {
                 border.width: 1
@@ -422,6 +429,20 @@ Window {
                     display: "date"
                 }
             }
+        }
+    }
+
+    component Tile: Rectangle {
+        required property int number
+
+        radius: 10
+        color: number ? root.getColor(number) : "#00000000"
+
+        Text {
+            anchors.centerIn: parent
+            font.bold: true
+            font.pointSize: 15
+            text: root.showNumber(number)
         }
     }
 }
