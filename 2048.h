@@ -6,42 +6,44 @@
 
 namespace game2048 {
 	const uint8_t MAX_SIZE = 4;
-	const float SPAWN_CHANCE_4 = .25;
+	const double SPAWN_CHANCE_4 = .25;
 	const uint8_t CELLS_AT_START = 2;
 
 	typedef std::array<uint8_t, MAX_SIZE> Line;
 	typedef std::array<Line, MAX_SIZE> Board;
 	enum class Direction { up, right, down, left };
 
-	class Random {
-	public:
-		Random();
-		unsigned long get_long(unsigned long max);
-		bool get_success(double success_chance);
-
-	private:
-		std::minstd_rand generator;
-	};
+	typedef struct GameAction {
+		uint8_t start_index;
+		uint8_t end_index;
+		bool merged;
+		uint8_t spawned_number;
+	} GameAction;
 
 	class Game {
 	public:
 		Game();
-		bool move(Direction);
+		std::vector<GameAction> move(Direction);
 		bool can_move() const;
-		Board get_board() const;
+		const Board& get_board() const;
 		unsigned int get_score() const;
 		void print_board() const;
 		void reset();
+		long to_index(const uint8_t* pointer) const;
 
 	private:
 		Board board {};
-		Random random {};
+		std::array<std::array<uint8_t*, MAX_SIZE>, MAX_SIZE> rotated_board {};
 		unsigned int score = 0;
+		std::vector<GameAction> current_turn_actions;
 
 		uint8_t* get_random_empty_cell();
 		int spawn_number();
-		bool move_left();
+		void move_left();
+		void reset_rotation();
 		void rotate();
+		void merge_on_line(uint8_t line_index);
+		void move_line_left(uint8_t line_index);
 	};
 }
 

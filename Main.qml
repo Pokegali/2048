@@ -196,17 +196,18 @@ Window {
             radius: 10
 
             Repeater {
-                model: 16
+                model: GameController.board
 
                 Tile {
                     required property int index
+                    required property int value
 
                     x: gridSpaces.itemAt(index).x + 8
                     y: gridSpaces.itemAt(index).y + 8
                     z: 1
                     width: gridSpaces.itemAt(index).width
                     height: gridSpaces.itemAt(index).height
-                    number: GameController.board[index]
+                    number: value
                 }
             }
             GridLayout {
@@ -438,6 +439,21 @@ Window {
         radius: 10
         color: number ? root.getColor(number) : "#00000000"
 
+        Behavior on x {
+            NumberAnimation {
+                duration: 100
+            }
+        }
+        Behavior on y {
+            NumberAnimation {
+                duration: 100
+            }
+        }
+        NumberAnimation on opacity {
+            from: 0
+            to: 1
+            duration: 100
+        }
         Text {
             anchors.centerIn: parent
             font.bold: true

@@ -1,18 +1,9 @@
 #include "GameController.h"
 
-#include <array>
-
-GameController::GameController(QObject *parent): QObject(parent) {}
-
-template<typename T, unsigned int Size>
-QList<T> listFromMatrix(const std::array<std::array<T, Size>, Size>& matrix) {
-	QList<T> result;
-	for (auto& row: matrix) { std::copy(row.begin(), row.end(), std::back_inserter(result)); }
-	return result;
-}
+GameController::GameController(QObject* parent): QObject(parent) { this->reset(); }
 
 quint32 GameController::getScore() const { return this->game.get_score(); }
-QList<quint8> GameController::getBoard() const { return listFromMatrix<uint8_t, game2048::MAX_SIZE>(this->game.get_board()); }
+BoardModel* GameController::getBoard() { return &this->board; }
 bool GameController::isInGame() const { return this->inGame; }
 
 void GameController::setInGame(bool status) {
@@ -20,7 +11,6 @@ void GameController::setInGame(bool status) {
 	this->inGame = status;
 	emit inGameChanged();
 }
-
 
 void GameController::move(const quint8 towards) {
 	game2048::Direction direction;
@@ -31,15 +21,90 @@ void GameController::move(const quint8 towards) {
 		case 3: direction = game2048::Direction::left; break;
 		default: return;
 	}
-	this->game.move(direction);
-	emit boardChanged();
+	std::vector<game2048::GameAction> moveResult = this->game.move(direction);
+	for (const auto& action: moveResult) {
+		if (action.merged) {
+			this->board.remove(action.start_index);
+			this->board.edit(action.end_index, action.end_index, true);
+		} else if (action.spawned_number) {
+			this->board.append({action.start_index, action.spawned_number});
+		} else {
+			this->board.edit(action.start_index, action.end_index, false);
+		}
+	}
 	emit scoreChanged();
 }
 
 void GameController::reset() {
 	this->game.reset();
-	emit boardChanged();
+	this->board.reset();
+	for (const auto& line: this->game.get_board()) {
+		for (const auto& x: line) {
+			if (x == 0) { continue; }
+			this->board.append({static_cast<uint8_t>(this->game.to_index(&x)), x});
+		}
+	}
 	emit scoreChanged();
 }
 
 bool GameController::canMove() { return this->game.can_move(); }
+
+BoardModel::BoardModel(QObject* parent) : QAbstractListModel(parent) {}
+
+int BoardModel::rowCount(const QModelIndex& parent) const {
+	Q_UNUSED(parent)
+	return static_cast<int>(this->tiles.size());
+}
+
+QHash<int, QByteArray> BoardModel::roleNames() const {
+	static QHash<int, QByteArray> mapping {
+		{BoardIndexRole, "index"},
+		{BoardValueRole, "value"}
+	};
+	return mapping;
+}
+
+QVariant BoardModel::data(const QModelIndex& index, int role) const {
+	if (!index.isValid() || index.row() >= this->tiles.size()) { return {}; }
+	const Tile& tile = this->tiles[index.row()];
+	switch (role) {
+		case BoardIndexRole:
+			return static_cast<int>(tile.index);
+		case BoardValueRole:
+			return static_cast<int>(tile.value);
+		default:
+			return {};
+	}
+}
+
+void BoardModel::append(const Tile& tile) {
+	int size = static_cast<int>(this->tiles.size());
+	this->beginInsertRows(QModelIndex(), size, size);
+	this->tiles.append(tile);
+	this->endInsertRows();
+}
+
+void BoardModel::remove(uint8_t index) {
+	const auto& tileIndex = this->getIndexInList(index);
+	this->beginRemoveRows(QModelIndex(), tileIndex, tileIndex);
+	this->tiles.removeAt(tileIndex);
+	this->endRemoveRows();
+}
+
+void BoardModel::edit(uint8_t oldIndex, uint8_t newIndex, bool valueIncrement) {
+	const auto& tileIndex = this->getIndexInList(oldIndex);
+	if (valueIncrement) { this->tiles[tileIndex].value++; }
+	this->tiles[tileIndex].index = newIndex;
+	QModelIndex qIndex = this->index(tileIndex);
+	emit this->dataChanged(qIndex, qIndex);
+}
+
+int BoardModel::getIndexInList(uint8_t tileIndex) const {
+	return static_cast<int>(std::find_if(this->tiles.begin(), this->tiles.end(), [&tileIndex](const Tile& tile) { return tile.index == tileIndex; }) - this->tiles.begin());
+}
+
+void BoardModel::reset() {
+	this->beginResetModel();
+	this->tiles.clear();
+	this->endResetModel();
+}
