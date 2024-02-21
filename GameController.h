@@ -9,6 +9,7 @@
 typedef struct Tile {
 	uint8_t index;
 	uint8_t value;
+	bool toDelete;
 } Tile;
 
 class BoardModel: public QAbstractListModel {
@@ -17,7 +18,8 @@ class BoardModel: public QAbstractListModel {
 public:
 	enum BoardModelRoles: int {
 		BoardIndexRole,
-		BoardValueRole
+		BoardValueRole,
+		BoardToDeleteRole
 	};
 
 	explicit BoardModel(QObject* parent = nullptr);
@@ -25,10 +27,11 @@ public:
 	QVariant data(const QModelIndex& index, int role) const override;
 	QHash<int, QByteArray> roleNames() const override;
 	void append(const Tile& tile);
+	void startRemove(uint8_t index);
 	void remove(uint8_t index);
 	void edit(uint8_t oldIndex, uint8_t newIndex, bool valueIncrement);
 	void reset();
-	int getIndexInList(uint8_t tileIndex) const;
+	int getIndexInList(uint8_t tileIndex, bool toDelete = false) const;
 
 private:
 	QList<Tile> tiles;
@@ -40,7 +43,7 @@ class GameController: public QObject {
 	QML_SINGLETON
 
 	Q_PROPERTY(quint32 score READ getScore NOTIFY scoreChanged)
-	Q_PROPERTY(BoardModel* board READ getBoard)
+	Q_PROPERTY(BoardModel* board READ getBoard CONSTANT)
 	Q_PROPERTY(bool inGame READ isInGame WRITE setInGame NOTIFY inGameChanged)
 
 public:
@@ -52,6 +55,7 @@ public:
 	Q_INVOKABLE void move(quint8 towards);
 	Q_INVOKABLE void reset();
 	Q_INVOKABLE bool canMove();
+	Q_INVOKABLE void deleteTileAt(quint8 index);
 
 signals:
 	void scoreChanged();

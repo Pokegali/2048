@@ -24,10 +24,10 @@ void GameController::move(const quint8 towards) {
 	std::vector<game2048::GameAction> moveResult = this->game.move(direction);
 	for (const auto& action: moveResult) {
 		if (action.merged) {
-			this->board.remove(action.start_index);
+			this->board.startRemove(action.start_index);
 			this->board.edit(action.end_index, action.end_index, true);
 		} else if (action.spawned_number) {
-			this->board.append({action.start_index, action.spawned_number});
+			this->board.append({action.start_index, action.spawned_number, false});
 		} else {
 			this->board.edit(action.start_index, action.end_index, false);
 		}
@@ -41,13 +41,15 @@ void GameController::reset() {
 	for (const auto& line: this->game.get_board()) {
 		for (const auto& x: line) {
 			if (x == 0) { continue; }
-			this->board.append({static_cast<uint8_t>(this->game.to_index(&x)), x});
+			this->board.append({static_cast<uint8_t>(this->game.to_index(&x)), x, false});
 		}
 	}
 	emit scoreChanged();
 }
 
 bool GameController::canMove() { return this->game.can_move(); }
+
+void GameController::deleteTileAt(quint8 index) { this->board.remove(index); }
 
 BoardModel::BoardModel(QObject* parent) : QAbstractListModel(parent) {}
 
@@ -59,7 +61,8 @@ int BoardModel::rowCount(const QModelIndex& parent) const {
 QHash<int, QByteArray> BoardModel::roleNames() const {
 	static QHash<int, QByteArray> mapping {
 		{BoardIndexRole, "index"},
-		{BoardValueRole, "value"}
+		{BoardValueRole, "value"},
+		{BoardToDeleteRole, "toDelete"}
 	};
 	return mapping;
 }
@@ -72,6 +75,8 @@ QVariant BoardModel::data(const QModelIndex& index, int role) const {
 			return static_cast<int>(tile.index);
 		case BoardValueRole:
 			return static_cast<int>(tile.value);
+		case BoardToDeleteRole:
+			return tile.toDelete;
 		default:
 			return {};
 	}
@@ -85,10 +90,17 @@ void BoardModel::append(const Tile& tile) {
 }
 
 void BoardModel::remove(uint8_t index) {
-	const auto& tileIndex = this->getIndexInList(index);
+	const auto& tileIndex = this->getIndexInList(index, true);
 	this->beginRemoveRows(QModelIndex(), tileIndex, tileIndex);
 	this->tiles.removeAt(tileIndex);
 	this->endRemoveRows();
+}
+
+void BoardModel::startRemove(uint8_t index) {
+	const auto& tileIndex = this->getIndexInList(index);
+	this->tiles[tileIndex].toDelete = true;
+	QModelIndex qIndex = this->index(tileIndex);
+	emit this->dataChanged(qIndex, qIndex);
 }
 
 void BoardModel::edit(uint8_t oldIndex, uint8_t newIndex, bool valueIncrement) {
@@ -99,8 +111,8 @@ void BoardModel::edit(uint8_t oldIndex, uint8_t newIndex, bool valueIncrement) {
 	emit this->dataChanged(qIndex, qIndex);
 }
 
-int BoardModel::getIndexInList(uint8_t tileIndex) const {
-	return static_cast<int>(std::find_if(this->tiles.begin(), this->tiles.end(), [&tileIndex](const Tile& tile) { return tile.index == tileIndex; }) - this->tiles.begin());
+int BoardModel::getIndexInList(uint8_t tileIndex, bool toDelete) const {
+	return static_cast<int>(std::find_if(this->tiles.begin(), this->tiles.end(), [&tileIndex, &toDelete](const Tile& tile) { return tile.index == tileIndex && tile.toDelete == toDelete; }) - this->tiles.begin());
 }
 
 void BoardModel::reset() {

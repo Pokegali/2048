@@ -201,6 +201,7 @@ Window {
                 Tile {
                     required property int index
                     required property int value
+                    required property bool toDelete
 
                     x: gridSpaces.itemAt(index).x + 8
                     y: gridSpaces.itemAt(index).y + 8
@@ -208,6 +209,21 @@ Window {
                     width: gridSpaces.itemAt(index).width
                     height: gridSpaces.itemAt(index).height
                     number: value
+
+                    NumberAnimation on opacity {
+                        id: fadeInAnimation
+                        from: 0
+                        to: 1
+                        duration: 100
+                    }
+                    NumberAnimation on opacity {
+                        id: fadeOutAnimation
+                        running: toDelete
+                        from: 1
+                        to: 0
+                        duration: 100
+                        onFinished: GameController.deleteTileAt(index)
+                    }
                 }
             }
             GridLayout {
@@ -448,11 +464,6 @@ Window {
             NumberAnimation {
                 duration: 100
             }
-        }
-        NumberAnimation on opacity {
-            from: 0
-            to: 1
-            duration: 100
         }
         Text {
             anchors.centerIn: parent
