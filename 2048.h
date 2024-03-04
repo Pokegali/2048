@@ -23,12 +23,13 @@ namespace game2048 {
 	class Game {
 	public:
 		Game();
-		std::vector<GameAction> move(Direction);
+		std::vector<GameAction> move(Direction, bool spawn = true);
 		bool can_move() const;
 		const Board& get_board() const;
 		unsigned int get_score() const;
 		void print_board() const;
 		void reset();
+		void set_board(const Board& new_board);
 		long to_index(const uint8_t* pointer) const;
 
 	private:

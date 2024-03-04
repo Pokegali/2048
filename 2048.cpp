@@ -110,7 +110,7 @@ void Game::reset_rotation() {
 	}
 }
 
-std::vector<GameAction> Game::move(Direction dir) {
+std::vector<GameAction> Game::move(Direction dir, bool spawn) {
 	this->current_turn_actions.clear();
 	this->reset_rotation();
 	switch (dir) {
@@ -135,7 +135,7 @@ std::vector<GameAction> Game::move(Direction dir) {
 		default:
 			return {};
 	}
-	if (!this->current_turn_actions.empty()) { this->spawn_number(); }
+	if (spawn && !this->current_turn_actions.empty()) { this->spawn_number(); }
 	return this->current_turn_actions;
 }
 
@@ -178,3 +178,13 @@ void Game::reset() {
 }
 
 long Game::to_index(const uint8_t* pointer) const { return pointer - &this->board[0][0]; }
+
+void Game::set_board(const Board &new_board) {
+	std::pair<const Line*, Line*> line;
+	std::pair<const uint8_t*, uint8_t*> cell;
+	for (line = {new_board.begin(), this->board.begin()}; line.first != new_board.end(); line.first++, line.second++) {
+		for (cell = {line.first->begin(), line.second->begin()}; cell.first != line.first->end(); cell.first++, cell.second++) {
+			*cell.second = *cell.first;
+		}
+	}
+}

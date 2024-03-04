@@ -29,3 +29,7 @@ qt_add_qml_module(${APP_EXE}
             Main.qml
 )
 target_link_libraries(${APP_EXE} PUBLIC g2048 PRIVATE Qt6::Quick)
+
+if(BUILD_TESTING)
+    add_subdirectory(tests)
+endif()
