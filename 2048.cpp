@@ -17,7 +17,9 @@ namespace game2048 {
 
 using namespace game2048;
 
-Game::Game() {
+Game::Game(uint8_t size): size(size) {
+	this->rotated_board.resize(size * size);
+	this->board.resize(size * size);
 	for (uint8_t i = 0; i < CELLS_AT_START; i++) { this->spawn_number(); }
 }
 
@@ -43,8 +45,8 @@ int Game::spawn_number() {
 }
 
 void Game::merge_on_line(uint8_t line_index) {
-	uint8_t** line_start = this->rotated_board.begin() + MAX_SIZE * line_index;
-	uint8_t** line_end = line_start + MAX_SIZE;
+	uint8_t** line_start = &*this->rotated_board.begin() + this->size * line_index;
+	uint8_t** line_end = line_start + this->size;
 	uint8_t active = 0;
 	uint8_t** x;
 	for (uint8_t** pointer = line_start; pointer < line_end; pointer++) {
@@ -64,8 +66,8 @@ void Game::merge_on_line(uint8_t line_index) {
 }
 
 void Game::move_line_left(uint8_t line_index) {
-	uint8_t** line_start = this->rotated_board.begin() + MAX_SIZE * line_index;
-	uint8_t** line_end = line_start + MAX_SIZE;
+	uint8_t** line_start = &*this->rotated_board.begin() + this->size * line_index;
+	uint8_t** line_end = line_start + this->size;
 	uint8_t** current_index = line_start;
 	for (uint8_t** pointer = line_start; pointer < line_end; pointer++) {
 		if (**pointer != 0) {
@@ -81,7 +83,7 @@ void Game::move_line_left(uint8_t line_index) {
 }
 
 void Game::move_left() {
-	for (uint8_t i = 0; i < MAX_SIZE; i++) {
+	for (uint8_t i = 0; i < this->size; i++) {
 		this->merge_on_line(i);
 		this->move_line_left(i);
 	}
@@ -91,21 +93,21 @@ void Game::rotate() {
 	unsigned int i, j;
 	uint8_t* tmp;
 	auto& matrix = this->rotated_board;
-	for (i = 0; i < MAX_SIZE / 2; i++) {
-		for (j = i; j < static_cast<uint8_t>(MAX_SIZE - i - 1); j++) {
-			tmp = matrix[i * MAX_SIZE + j];
-			matrix[i * MAX_SIZE + j] = matrix[j * MAX_SIZE + MAX_SIZE - i - 1];
-			matrix[j * MAX_SIZE + MAX_SIZE - i - 1] = matrix[(MAX_SIZE - i - 1) * MAX_SIZE + MAX_SIZE - j - 1];
-			matrix[(MAX_SIZE - i - 1) * MAX_SIZE + MAX_SIZE - j - 1] = matrix[(MAX_SIZE - j - 1) * MAX_SIZE + i];
-			matrix[(MAX_SIZE - j - 1) * MAX_SIZE + i] = tmp;
+	for (i = 0; i < this->size / 2; i++) {
+		for (j = i; j < static_cast<uint8_t>(this->size - i - 1); j++) {
+			tmp = matrix[i * this->size + j];
+			matrix[i * this->size + j] = matrix[(j + 1) * this->size - i - 1];
+			matrix[(j + 1) * this->size - i - 1] = matrix[(this->size - i) * this->size - j - 1];
+			matrix[(this->size - i) * this->size - j - 1] = matrix[(this->size - j - 1) * this->size + i];
+			matrix[(this->size - j - 1) * this->size + i] = tmp;
 		}
 	}
 }
 
 void Game::reset_rotation() {
-	uint8_t* start = this->board.begin();
-	uint8_t** rotated_start = this->rotated_board.begin();
-	for (uint8_t i = 0; i < MAX_SIZE * MAX_SIZE; i++) {
+	uint8_t* start = &*this->board.begin();
+	uint8_t** rotated_start = &*this->rotated_board.begin();
+	for (uint8_t i = 0; i < this->size * this->size; i++) {
 		*(rotated_start + i) = start + i;
 	}
 }
@@ -140,13 +142,13 @@ std::vector<GameAction> Game::move(Direction dir, bool spawn) {
 }
 
 void Game::print_board() const {
-	static constexpr uint8_t OUTPUT_LENGTH = 5 * MAX_SIZE + 1;
+	const auto OUTPUT_LENGTH = static_cast<uint8_t>(5 * this->size + 1);
 	const std::string LINE_SEPARATOR(OUTPUT_LENGTH, '-');
 	std::cout << LINE_SEPARATOR << std::endl;
-	for (unsigned int i = 0; i < MAX_SIZE; i++) {
+	for (unsigned int i = 0; i < this->size; i++) {
 		std::cout << "|";
-		for (unsigned int j = 0; j < MAX_SIZE; j++) {
-			std::cout << number_repr(this->board[i * MAX_SIZE + j]) << "|";
+		for (unsigned int j = 0; j < this->size; j++) {
+			std::cout << number_repr(this->board[i * this->size + j]) << "|";
 		}
 		std::cout << std::endl << LINE_SEPARATOR << std::endl;
 	}
@@ -154,16 +156,17 @@ void Game::print_board() const {
 
 const Board& Game::get_board() const { return this->board; }
 unsigned int Game::get_score() const { return this->score; }
+uint8_t Game::get_size() const { return this->size; }
 
 bool Game::can_move() const {
 	unsigned int i, j, current_x, current_y;
-	for (i = 0; i < MAX_SIZE; i++) {
+	for (i = 0; i < this->size; i++) {
 		current_x = 0;
 		current_y = 0;
-		for (j = 0; j < MAX_SIZE; j++) {
-			if (this->board[i * MAX_SIZE + j] == current_x || this->board[j * MAX_SIZE + i] == current_y || !this->board[i * MAX_SIZE + j]) { return true; }
-			current_x = this->board[i * MAX_SIZE + j];
-			current_y = this->board[j * MAX_SIZE + i];
+		for (j = 0; j < this->size; j++) {
+			if (this->board[i * this->size + j] == current_x || this->board[j * this->size + i] == current_y || !this->board[i * this->size + j]) { return true; }
+			current_x = this->board[i * this->size + j];
+			current_y = this->board[j * this->size + i];
 		}
 	}
 	return false;
@@ -178,7 +181,5 @@ void Game::reset() {
 long Game::to_index(const uint8_t* pointer) const { return pointer - &this->board[0]; }
 
 void Game::set_board(const Board& new_board) {
-	for (uint8_t i = 0; i < MAX_SIZE * MAX_SIZE; i++) {
-		*(this->board.begin() + i) = *(new_board.begin() + i);
-	}
+	this->board = new_board;
 }

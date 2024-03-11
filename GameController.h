@@ -67,7 +67,7 @@ signals:
 
 private:
 	BoardModel board;
-	game2048::Game game {};
+	game2048::Game game {4};
 	bool inGame = true;
 };
 

@@ -5,7 +5,7 @@ GameController::GameController(QObject* parent): QObject(parent) { this->reset()
 quint32 GameController::getScore() const { return this->game.get_score(); }
 BoardModel* GameController::getBoard() { return &this->board; }
 bool GameController::isInGame() const { return this->inGame; }
-quint8 GameController::getGameSize() const { return game2048::MAX_SIZE; }
+quint8 GameController::getGameSize() const { return this->game.get_size(); }
 
 void GameController::setInGame(bool status) {
     if (status == this->inGame) { return; }
@@ -14,9 +14,9 @@ void GameController::setInGame(bool status) {
 }
 
 void GameController::setGameSize(quint8 gameSize) {
-	Q_UNUSED(gameSize);
-	qWarning() << "Can't set game size as of now";
+	this->game = game2048::Game(gameSize);
 	emit gameSizeChanged();
+	this->reset();
 }
 
 void GameController::move(const quint8 towards) {

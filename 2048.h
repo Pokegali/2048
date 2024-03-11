@@ -5,11 +5,10 @@
 #include <random>
 
 namespace game2048 {
-	const uint8_t MAX_SIZE = 4;
 	const double SPAWN_CHANCE_4 = .25;
 	const uint8_t CELLS_AT_START = 2;
 
-	typedef std::array<uint8_t, MAX_SIZE * MAX_SIZE> Board;
+	typedef std::vector<uint8_t> Board;
 	enum class Direction { up, right, down, left };
 
 	typedef struct GameAction {
@@ -21,10 +20,11 @@ namespace game2048 {
 
 	class Game {
 	public:
-		Game();
+		explicit Game(uint8_t size);
 		std::vector<GameAction> move(Direction, bool spawn = true);
 		bool can_move() const;
 		const Board& get_board() const;
+		uint8_t get_size() const;
 		unsigned int get_score() const;
 		void print_board() const;
 		void reset();
@@ -33,8 +33,9 @@ namespace game2048 {
 
 	private:
 		Board board {};
-		std::array<uint8_t*, MAX_SIZE * MAX_SIZE> rotated_board {};
+		std::vector<uint8_t*> rotated_board {};
 		unsigned int score = 0;
+		uint8_t size;
 		std::vector<GameAction> current_turn_actions;
 
 		uint8_t* get_random_empty_cell();

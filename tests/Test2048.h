@@ -13,7 +13,7 @@ private slots:
 	void spawnTest();
 
 private:
-	game2048::Game game;
+	game2048::Game game {4};
 };
 
 #endif //INC_2048_TEST2048_H
