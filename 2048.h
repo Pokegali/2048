@@ -9,8 +9,7 @@ namespace game2048 {
 	const double SPAWN_CHANCE_4 = .25;
 	const uint8_t CELLS_AT_START = 2;
 
-	typedef std::array<uint8_t, MAX_SIZE> Line;
-	typedef std::array<Line, MAX_SIZE> Board;
+	typedef std::array<uint8_t, MAX_SIZE * MAX_SIZE> Board;
 	enum class Direction { up, right, down, left };
 
 	typedef struct GameAction {
@@ -34,7 +33,7 @@ namespace game2048 {
 
 	private:
 		Board board {};
-		std::array<std::array<uint8_t*, MAX_SIZE>, MAX_SIZE> rotated_board {};
+		std::array<uint8_t*, MAX_SIZE * MAX_SIZE> rotated_board {};
 		unsigned int score = 0;
 		std::vector<GameAction> current_turn_actions;
 

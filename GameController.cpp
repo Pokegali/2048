@@ -45,11 +45,9 @@ void GameController::move(const quint8 towards) {
 void GameController::reset() {
 	this->game.reset();
 	this->board.reset();
-	for (const auto& line: this->game.get_board()) {
-		for (const auto& x: line) {
-			if (x == 0) { continue; }
-			this->board.append({static_cast<uint8_t>(this->game.to_index(&x)), x, false});
-		}
+	for (const auto& x: this->game.get_board()) {
+		if (x == 0) { continue; }
+		this->board.append({static_cast<uint8_t>(this->game.to_index(&x)), x, false});
 	}
 	emit scoreChanged();
 }

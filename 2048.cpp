@@ -23,11 +23,9 @@ Game::Game() {
 
 uint8_t* Game::get_random_empty_cell() {
 	std::vector<uint8_t*> empty_cells;
-	for (Line& line: this->board) {
-		for (uint8_t& element: line) {
-			if (element == 0) {
-				empty_cells.emplace_back(&element);
-			}
+	for (uint8_t& element: this->board) {
+		if (element == 0) {
+			empty_cells.emplace_back(&element);
 		}
 	}
 	if (empty_cells.empty()) { return nullptr; }
@@ -39,44 +37,46 @@ int Game::spawn_number() {
 	if (cell == nullptr) { return 1; }
 	uint8_t number = arc4random() < UINT32_MAX * SPAWN_CHANCE_4 ? 2 : 1;
 	*cell = number;
-	long index = cell - this->board.at(0).begin();
+	long index = this->to_index(cell);
 	this->current_turn_actions.emplace_back(index, index, false, number);
 	return 0;
 }
 
 void Game::merge_on_line(uint8_t line_index) {
-	auto& line = this->rotated_board.at(line_index);
+	uint8_t** line_start = this->rotated_board.begin() + MAX_SIZE * line_index;
+	uint8_t** line_end = line_start + MAX_SIZE;
 	uint8_t active = 0;
-	uint8_t x;
-	for (uint8_t i = 0; i < MAX_SIZE; i++) {
-		if (*line[i] == active && active != 0) {
-			*line[x] = 0;
-			*line[i] = active + 1;
+	uint8_t** x;
+	for (uint8_t** pointer = line_start; pointer < line_end; pointer++) {
+		if (**pointer == active && active != 0) {
+			**x = 0;
+			**pointer = active + 1;
 			this->score += 1 << (active + 1);
-			this->current_turn_actions.emplace_back(to_index(line[x]), to_index(line[i]), true, NULL);
+			this->current_turn_actions.emplace_back(this->to_index(*x), this->to_index(*pointer), true, NULL);
 			active = 0;
 		} else {
-			if (*line[i] != 0) {
-				active = *line[i];
-				x = i;
+			if (**pointer != 0) {
+				active = **pointer;
+				x = pointer;
 			}
 		}
 	}
 }
 
 void Game::move_line_left(uint8_t line_index) {
-	auto& line = this->rotated_board.at(line_index);
-	uint8_t index = 0;
-	for (uint8_t i = 0; i < MAX_SIZE; i++) {
-		if (*line[i] != 0){
-			if (i != index) {
-				this->current_turn_actions.emplace_back(to_index(line[i]), to_index(line[index]), false, NULL);
+	uint8_t** line_start = this->rotated_board.begin() + MAX_SIZE * line_index;
+	uint8_t** line_end = line_start + MAX_SIZE;
+	uint8_t** current_index = line_start;
+	for (uint8_t** pointer = line_start; pointer < line_end; pointer++) {
+		if (**pointer != 0) {
+			if (pointer != current_index) {
+				this->current_turn_actions.emplace_back(this->to_index(*pointer), this->to_index(*current_index), false, NULL);
 			}
-			*line[index++] = *line[i];
+			**(current_index++) = **pointer;
 		}
 	}
-	while (index < MAX_SIZE) {
-		*line[index++] = 0;
+	while (current_index < line_end) {
+		**(current_index++) = 0;
 	}
 }
 
@@ -88,23 +88,23 @@ void Game::move_left() {
 }
 
 void Game::rotate() {
-	uint8_t i, j;
+	unsigned int i, j;
 	uint8_t* tmp;
 	auto& matrix = this->rotated_board;
 	for (i = 0; i < MAX_SIZE / 2; i++) {
 		for (j = i; j < static_cast<uint8_t>(MAX_SIZE - i - 1); j++) {
-			tmp = matrix[i][j];
-			matrix[i][j] = matrix[j][MAX_SIZE - i - 1];
-			matrix[j][MAX_SIZE - i - 1] = matrix[MAX_SIZE - i - 1][MAX_SIZE - j - 1];
-			matrix[MAX_SIZE - i - 1][MAX_SIZE - j - 1] = matrix[MAX_SIZE - j - 1][i];
-			matrix[MAX_SIZE - j - 1][i] = tmp;
+			tmp = matrix[i * MAX_SIZE + j];
+			matrix[i * MAX_SIZE + j] = matrix[j * MAX_SIZE + MAX_SIZE - i - 1];
+			matrix[j * MAX_SIZE + MAX_SIZE - i - 1] = matrix[(MAX_SIZE - i - 1) * MAX_SIZE + MAX_SIZE - j - 1];
+			matrix[(MAX_SIZE - i - 1) * MAX_SIZE + MAX_SIZE - j - 1] = matrix[(MAX_SIZE - j - 1) * MAX_SIZE + i];
+			matrix[(MAX_SIZE - j - 1) * MAX_SIZE + i] = tmp;
 		}
 	}
 }
 
 void Game::reset_rotation() {
-	uint8_t* start = this->board.at(0).begin();
-	uint8_t** rotated_start = this->rotated_board.at(0).begin();
+	uint8_t* start = this->board.begin();
+	uint8_t** rotated_start = this->rotated_board.begin();
 	for (uint8_t i = 0; i < MAX_SIZE * MAX_SIZE; i++) {
 		*(rotated_start + i) = start + i;
 	}
@@ -143,10 +143,10 @@ void Game::print_board() const {
 	static constexpr uint8_t OUTPUT_LENGTH = 5 * MAX_SIZE + 1;
 	const std::string LINE_SEPARATOR(OUTPUT_LENGTH, '-');
 	std::cout << LINE_SEPARATOR << std::endl;
-	for (const Line& line : this->board) {
+	for (unsigned int i = 0; i < MAX_SIZE; i++) {
 		std::cout << "|";
-		for (const uint8_t& number: line) {
-			std::cout << number_repr(number) << "|";
+		for (unsigned int j = 0; j < MAX_SIZE; j++) {
+			std::cout << number_repr(this->board[i * MAX_SIZE + j]) << "|";
 		}
 		std::cout << std::endl << LINE_SEPARATOR << std::endl;
 	}
@@ -156,35 +156,29 @@ const Board& Game::get_board() const { return this->board; }
 unsigned int Game::get_score() const { return this->score; }
 
 bool Game::can_move() const {
-	uint8_t i, j, current_x, current_y;
+	unsigned int i, j, current_x, current_y;
 	for (i = 0; i < MAX_SIZE; i++) {
 		current_x = 0;
 		current_y = 0;
 		for (j = 0; j < MAX_SIZE; j++) {
-			if (this->board[i][j] == current_x || this->board[j][i] == current_y || !this->board[i][j]) { return true; }
-			current_x = this->board[i][j];
-			current_y = this->board[j][i];
+			if (this->board[i * MAX_SIZE + j] == current_x || this->board[j * MAX_SIZE + i] == current_y || !this->board[i * MAX_SIZE + j]) { return true; }
+			current_x = this->board[i * MAX_SIZE + j];
+			current_y = this->board[j * MAX_SIZE + i];
 		}
 	}
 	return false;
 }
 
 void Game::reset() {
-	for (Line& line: this->board) {
-		for (uint8_t& tile: line) { tile = 0; }
-	}
+	for (uint8_t& tile: this->board) { tile = 0; }
 	this->score = 0;
 	for (uint8_t i = 0; i < CELLS_AT_START; i++) { this->spawn_number(); }
 }
 
-long Game::to_index(const uint8_t* pointer) const { return pointer - &this->board[0][0]; }
+long Game::to_index(const uint8_t* pointer) const { return pointer - &this->board[0]; }
 
-void Game::set_board(const Board &new_board) {
-	std::pair<const Line*, Line*> line;
-	std::pair<const uint8_t*, uint8_t*> cell;
-	for (line = {new_board.begin(), this->board.begin()}; line.first != new_board.end(); line.first++, line.second++) {
-		for (cell = {line.first->begin(), line.second->begin()}; cell.first != line.first->end(); cell.first++, cell.second++) {
-			*cell.second = *cell.first;
-		}
+void Game::set_board(const Board& new_board) {
+	for (uint8_t i = 0; i < MAX_SIZE * MAX_SIZE; i++) {
+		*(this->board.begin() + i) = *(new_board.begin() + i);
 	}
 }
