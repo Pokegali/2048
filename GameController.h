@@ -45,6 +45,7 @@ class GameController: public QObject {
 	Q_PROPERTY(quint32 score READ getScore NOTIFY scoreChanged)
 	Q_PROPERTY(BoardModel* board READ getBoard CONSTANT)
 	Q_PROPERTY(bool inGame READ isInGame WRITE setInGame NOTIFY inGameChanged)
+	Q_PROPERTY(quint8 gameSize READ getGameSize WRITE setGameSize NOTIFY gameSizeChanged)
 
 public:
 	explicit GameController(QObject* parent = nullptr);
@@ -52,6 +53,8 @@ public:
 	BoardModel* getBoard();
 	bool isInGame() const;
 	void setInGame(bool);
+	quint8 getGameSize() const;
+	void setGameSize(quint8);
 	Q_INVOKABLE void move(quint8 towards);
 	Q_INVOKABLE void reset();
 	Q_INVOKABLE bool canMove();
@@ -60,6 +63,7 @@ public:
 signals:
 	void scoreChanged();
 	void inGameChanged();
+	void gameSizeChanged();
 
 private:
 	BoardModel board;

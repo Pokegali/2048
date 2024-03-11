@@ -230,13 +230,13 @@ Window {
                 anchors.fill: parent
                 anchors.margins: 8
                 columnSpacing: 8
-                columns: 4
+                columns: GameController.gameSize
                 rowSpacing: 8
-                rows: 4
+                rows: GameController.gameSize
 
                 Repeater {
                     id: gridSpaces
-                    model: 16
+                    model: GameController.gameSize ** 2
 
                     Rectangle {
                         Layout.fillHeight: true
@@ -402,8 +402,6 @@ Window {
     Window {
         id: scores
 
-        property int page: 0
-
         maximumHeight: minimumHeight
         maximumWidth: minimumWidth
         minimumHeight: 450
@@ -418,7 +416,9 @@ Window {
             rowSpacing: 1
             interactive: false
             contentItem.anchors.horizontalCenter: horizontalCenter
-
+            ScrollBar.vertical: ScrollBar {
+                active: true
+            }
             delegate: Rectangle {
                 border.width: 1
                 implicitHeight: 30
@@ -430,7 +430,7 @@ Window {
                 }
             }
             model: TableModel {
-                rows: SaveController.scores.slice(scores.page * 10, (scores.page + 1) * 10).map(x => ({
+                rows: SaveController.scores.map(x => ({
                     "score": x.score.toLocaleString(Qt.locale("fr_FR"), "f", 0),
                     "username": x.username,
                     "date": x.date.toLocaleDateString("fr-FR")
