@@ -1,6 +1,8 @@
 #include "2048.h"
 
 #include <iostream>
+#include <string>
+#include <random>
 #include <vector>
 
 namespace game2048 {
@@ -17,6 +19,9 @@ namespace game2048 {
 
 using namespace game2048;
 
+static std::random_device random_device;
+static std::mt19937 rng(random_device());
+
 Game::Game(uint8_t size): size(size) {
 	this->rotated_board.resize(size * size);
 	this->board.resize(size * size);
@@ -31,13 +36,15 @@ uint8_t* Game::get_random_empty_cell() {
 		}
 	}
 	if (empty_cells.empty()) { return nullptr; }
-	return empty_cells[arc4random() % empty_cells.size()];
+	std::uniform_int_distribution<unsigned long> distribution(0, empty_cells.size() - 1);
+	return empty_cells[distribution(rng)];
 }
 
 int Game::spawn_number() {
 	uint8_t* cell = this->get_random_empty_cell();
 	if (cell == nullptr) { return 1; }
-	uint8_t number = arc4random() < UINT32_MAX * SPAWN_CHANCE_4 ? 2 : 1;
+	static std::bernoulli_distribution spawn_4(SPAWN_CHANCE_4);
+	uint8_t number = spawn_4(rng) ? 2 : 1;
 	*cell = number;
 	long index = this->to_index(cell);
 	this->current_turn_actions.emplace_back(index, index, false, number);

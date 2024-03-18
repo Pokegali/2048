@@ -34,8 +34,12 @@ Window {
 
                 onTriggered: scores.show()
             }
-            MenuSeparator {
+            Action {
+                text: "Change board size"
+
+                onTriggered: console.log("change game size")
             }
+            MenuSeparator {}
             Action {
                 text: "Quit"
 
