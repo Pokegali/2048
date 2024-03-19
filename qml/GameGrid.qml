@@ -3,13 +3,10 @@ import QtQuick.Layouts
 import gameModule
 
 Rectangle {
+    id: grid
     property alias shadow: shadow
     property int spacing: 32 / GameController.gameSize
 
-    id: grid
-    Layout.alignment: Qt.AlignHCenter
-    Layout.fillHeight: true
-    Layout.preferredWidth: grid.height
     color: "#b0b0b0"
     radius: 10
 

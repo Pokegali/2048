@@ -3,12 +3,8 @@ import QtQuick.Controls
 import Qt.labs.qmlmodels
 import gameModule
 
-Window {
+Dialog {
     id: scores
-    maximumHeight: minimumHeight
-    maximumWidth: minimumWidth
-    minimumHeight: 450
-    minimumWidth: 360
     title: "2048 | Best scores"
 
     TableView {

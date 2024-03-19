@@ -1,34 +1,46 @@
 import QtQuick
+import QtQuick.Controls
 import QtQuick.Layouts
-import gameModule
+import Qt.labs.qmlmodels
+import Game
 
-Window {
+ApplicationWindow {
     id: root
 
     property alias gameShadow: grid.shadow
 
-    maximumHeight: minimumHeight
-    maximumWidth: minimumWidth
     minimumHeight: 520
     minimumWidth: 500
     title: "2048"
     visible: true
 
-    MainMenu {
-        id: menu
-        width: parent.width
+    ResetDialog {
+        id: resetDialog
+        anchors.centerIn: parent
     }
+
+    EndDialog {
+        id: endDialog
+        anchors.centerIn: parent
+    }
+
+    UndoDialog {// not used
+        id: undoDialog
+        anchors.centerIn: parent
+    }
+
+    header: GameMenuBar {
+        id: menu
+        onShowScore: {
+            scores.show()
+        }
+    }
+
     ColumnLayout {
         id: mainColumn
-        anchors.bottom: parent.bottom
-        anchors.left: parent.left
-        anchors.margins: 10
-        anchors.right: parent.right
-        anchors.top: menu.bottom
+        anchors.fill: parent
         focus: true
-        height: 500
         spacing: 25
-        width: 500
 
         Keys.onPressed: event => {
             switch (event.key) {
@@ -55,23 +67,12 @@ Window {
         }
 
         GameHeader {}
+
         GameGrid {
             id: grid
+            Layout.alignment: Qt.AlignHCenter
+            Layout.fillHeight: true
+            Layout.preferredWidth: grid.height
         }
-    }
-    ResetDialog {
-        id: resetDialog
-    }
-    EndDialog {
-        id: endDialog
-    }
-    UndoDialog {
-        id: undoDialog
-    }
-    GameSettingsDialog {
-        id: settings
-    }
-    ScoresWindow {
-        id: scores
     }
 }

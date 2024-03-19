@@ -1,51 +1,23 @@
 #ifndef INC_2048_GAMECONTROLLER_H
 #define INC_2048_GAMECONTROLLER_H
 
+#include "2048.h"
+#include "BoardModel.h"
 #include <QAbstractListModel>
 #include <QObject>
 #include <qqml.h>
-#include "2048.h"
 
-typedef struct Tile {
-	uint8_t index;
-	uint8_t value;
-	bool toDelete;
-} Tile;
+class GameController : public QObject
+{
+    Q_OBJECT
+    QML_ELEMENT
+    QML_SINGLETON
 
-class BoardModel: public QAbstractListModel {
-	Q_OBJECT
+    Q_PROPERTY(quint32 score READ getScore NOTIFY scoreChanged)
+    Q_PROPERTY(bool inGame READ isInGame WRITE setInGame NOTIFY inGameChanged)
+    Q_PROPERTY(quint8 gameSize READ getGameSize WRITE setGameSize NOTIFY gameSizeChanged)
+    Q_PROPERTY(BoardModel* board READ getBoard CONSTANT)
 
-public:
-	enum BoardModelRoles: int {
-		BoardIndexRole,
-		BoardValueRole,
-		BoardToDeleteRole
-	};
-
-	explicit BoardModel(QObject* parent = nullptr);
-	int rowCount(const QModelIndex& parent) const override;
-	QVariant data(const QModelIndex& index, int role) const override;
-	QHash<int, QByteArray> roleNames() const override;
-	void append(const Tile& tile);
-	void startRemove(uint8_t index);
-	void remove(uint8_t index);
-	void edit(uint8_t oldIndex, uint8_t newIndex, bool valueIncrement);
-	void reset();
-	int getIndexInList(uint8_t tileIndex, bool toDelete = false) const;
-
-private:
-	QList<Tile> tiles;
-};
-
-class GameController: public QObject {
-	Q_OBJECT
-	QML_ELEMENT
-	QML_SINGLETON
-
-	Q_PROPERTY(quint32 score READ getScore NOTIFY scoreChanged)
-	Q_PROPERTY(BoardModel* board READ getBoard CONSTANT)
-	Q_PROPERTY(bool inGame READ isInGame WRITE setInGame NOTIFY inGameChanged)
-	Q_PROPERTY(quint8 gameSize READ getGameSize WRITE setGameSize NOTIFY gameSizeChanged)
 
 public:
 	static const int MAX_GAME_SIZE = 8;
@@ -71,14 +43,14 @@ public:
 	static game2048::Direction directionToGameDirection(GameController::Direction);
 
 signals:
-	void scoreChanged();
-	void inGameChanged();
-	void gameSizeChanged();
+    void scoreChanged();
+    void inGameChanged();
+    void gameSizeChanged();
 
 private:
-	BoardModel board;
-	game2048::Game game {4};
-	bool inGame = true;
+    BoardModel board;
+    game2048::Game game{4};
+    bool inGame= true;
 };
 
 
