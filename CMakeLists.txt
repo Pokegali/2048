@@ -40,6 +40,7 @@ qt_add_qml_module(${APP_EXE}
             qml/UndoDialog.qml
 )
 target_link_libraries(${APP_EXE} PUBLIC g2048 PRIVATE Qt6::Quick)
+set_target_properties(${APP_EXE} PROPERTIES MACOSX_BUNDLE TRUE)
 
 if(BUILD_TESTING)
     add_subdirectory(tests)

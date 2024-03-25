@@ -47,7 +47,7 @@ void GameController::reset() {
 	this->board.reset();
 	for (const auto& x: this->game.get_board()) {
 		if (x == 0) { continue; }
-		this->board.append({static_cast<uint8_t>(this->game.to_index(&x)), x, false});
+		this->board.append({this->game.to_index(&x), x, false});
 	}
 	emit scoreChanged();
 }

@@ -4,6 +4,10 @@
 #include <string>
 #include <random>
 
+inline constexpr uint8_t operator "" _ui8(unsigned long long arg) noexcept {
+	return static_cast<uint8_t>(arg);
+}
+
 namespace game2048 {
 	static std::string number_repr(uint8_t repr_number) {
 		if (repr_number == 0) { return "    "; }
@@ -45,8 +49,8 @@ int Game::spawn_number() {
 	static std::bernoulli_distribution spawn_4(SPAWN_CHANCE_4);
 	uint8_t number = spawn_4(rng) ? 2 : 1;
 	*cell = number;
-	long index = this->to_index(cell);
-	this->current_turn_actions.emplace_back(index, index, false, number);
+	uint8_t index = this->to_index(cell);
+	this->current_turn_actions.emplace_back() = {index, index, false, number};
 	return 0;
 }
 
@@ -60,7 +64,7 @@ void Game::merge_on_line(uint8_t line_index) {
 			**x = 0;
 			**pointer = active + 1;
 			this->score += 1 << (active + 1);
-			this->current_turn_actions.emplace_back(this->to_index(*x), this->to_index(*pointer), true, NULL);
+			this->current_turn_actions.emplace_back() = {this->to_index(*x), this->to_index(*pointer), true, 0_ui8};
 			active = 0;
 		} else {
 			if (**pointer != 0) {
@@ -78,7 +82,7 @@ void Game::move_line_left(uint8_t line_index) {
 	for (uint8_t** pointer = line_start; pointer < line_end; pointer++) {
 		if (**pointer != 0) {
 			if (pointer != current_index) {
-				this->current_turn_actions.emplace_back(this->to_index(*pointer), this->to_index(*current_index), false, NULL);
+				this->current_turn_actions.emplace_back() = {this->to_index(*pointer), this->to_index(*current_index), false, 0_ui8};
 			}
 			**(current_index++) = **pointer;
 		}
@@ -184,7 +188,7 @@ void Game::reset() {
 	for (uint8_t i = 0; i < CELLS_AT_START; i++) { this->spawn_number(); }
 }
 
-long Game::to_index(const uint8_t* pointer) const { return pointer - &this->board[0]; }
+uint8_t Game::to_index(const uint8_t* pointer) const { return static_cast<uint8_t>(pointer - &this->board[0]); }
 
 void Game::set_board(const Board& new_board) {
 	this->board = new_board;

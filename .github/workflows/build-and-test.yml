@@ -85,3 +85,36 @@ jobs:
         with:
           name: 2048-windows
           path: ${{ github.workspace }}/build/bin/
+
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v3
+        with:
+          version: 6.6.2
+          setup-python: false
+
+      - name: Configure CMake
+        run: cmake -B ${{ github.workspace }}/build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_TESTING=ON
+
+      - name: Build
+        run: cmake --build ${{ github.workspace }}/build --config ${{ env.BUILD_TYPE }}
+
+      - name: Test
+        working-directory: ${{ github.workspace }}/build
+        run: ./bin/test_2048
+
+      - name: Run DeployQt
+        working-directory: ${{ github.workspace }}/build/bin
+        run: |
+          mv game.app 2048.app
+          macdeployqt 2048.app -qmldir=${{ github.workspace }}/qml -dmg
+
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: 2048-macos
+          path: ${{ github.workspace }}/build/bin/2048.dmg

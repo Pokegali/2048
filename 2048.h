@@ -29,7 +29,7 @@ namespace game2048 {
 		void print_board() const;
 		void reset();
 		void set_board(const Board& new_board);
-		long to_index(const uint8_t* pointer) const;
+		uint8_t to_index(const uint8_t* pointer) const;
 
 	private:
 		Board board {};
