@@ -1,8 +1,8 @@
 #ifndef INC_2048_2048_H
 #define INC_2048_2048_H
 
-#include <array>
-#include <random>
+#include <cstdint>
+#include <vector>
 
 namespace game2048 {
 	const double SPAWN_CHANCE_4 = .25;

@@ -14,7 +14,7 @@ Popup {
         spacing: 10
 
         Text {
-            color: "white"
+            color: root.palette.text
             text: "No, you can't cheat! It's bad."
         }
         Button {

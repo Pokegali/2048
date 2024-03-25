@@ -17,7 +17,7 @@ Popup {
 
         Text {
             anchors.horizontalCenter: parent.horizontalCenter
-            color: "white"
+            color: root.palette.text
             horizontalAlignment: Text.AlignHCenter
             text: `End of game! Your score is ${GameController.score.toLocaleString(Qt.locale("fr_FR"), "f", 0)}.\nEnter a username if you wish to save your score.`
         }
@@ -32,7 +32,7 @@ Popup {
                 activeFocusOnTab: true
                 anchors.centerIn: parent
                 autoScroll: false
-                color: "white"
+                color: root.palette.text
                 focus: true
                 maximumLength: 30
 

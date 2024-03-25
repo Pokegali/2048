@@ -3,7 +3,6 @@
 #include <iostream>
 #include <string>
 #include <random>
-#include <vector>
 
 namespace game2048 {
 	static std::string number_repr(uint8_t repr_number) {

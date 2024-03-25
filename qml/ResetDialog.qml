@@ -15,7 +15,7 @@ Popup {
 
         Text {
             id: resetDialogText
-            color: "white"
+            color: root.palette.text
         }
         Row {
             anchors.horizontalCenter: parent.horizontalCenter
