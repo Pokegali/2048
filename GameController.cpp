@@ -19,16 +19,8 @@ void GameController::setGameSize(quint8 gameSize) {
 	this->reset();
 }
 
-void GameController::move(const quint8 towards) {
-	game2048::Direction direction;
-	switch (towards) {
-		case 0: direction = game2048::Direction::up; break;
-		case 1: direction = game2048::Direction::right; break;
-		case 2: direction = game2048::Direction::down; break;
-		case 3: direction = game2048::Direction::left; break;
-		default: return;
-	}
-	std::vector<game2048::GameAction> moveResult = this->game.move(direction);
+void GameController::move(const Direction towards) {
+	std::vector<game2048::GameAction> moveResult = this->game.move(directionToGameDirection(towards));
 	for (const auto& action: moveResult) {
 		if (action.merged) {
 			this->board.startRemove(action.start_index);
@@ -55,6 +47,16 @@ void GameController::reset() {
 bool GameController::canMove() { return this->game.can_move(); }
 
 void GameController::deleteTileAt(quint8 index) { this->board.remove(index); }
+
+game2048::Direction GameController::directionToGameDirection(Direction direction) {
+	switch (direction) {
+		case Direction::up: return game2048::Direction::up;
+		case Direction::down: return game2048::Direction::down;
+		case Direction::right: return game2048::Direction::right;
+		case Direction::left: return game2048::Direction::left;
+		default: throw std::invalid_argument("Invalid argument for direction.");
+	}
+}
 
 BoardModel::BoardModel(QObject* parent) : QAbstractListModel(parent) {}
 

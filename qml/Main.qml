@@ -33,16 +33,16 @@ Window {
         Keys.onPressed: event => {
             switch (event.key) {
             case Qt.Key_Down:
-                GameController.move(2);
+                GameController.move(GameController.Direction.down);
                 break;
             case Qt.Key_Left:
-                GameController.move(3);
+                GameController.move(GameController.Direction.left);
                 break;
             case Qt.Key_Right:
-                GameController.move(1);
+                GameController.move(GameController.Direction.right);
                 break;
             case Qt.Key_Up:
-                GameController.move(0);
+                GameController.move(GameController.Direction.up);
                 break;
             default:
                 break;

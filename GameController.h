@@ -48,6 +48,11 @@ class GameController: public QObject {
 	Q_PROPERTY(quint8 gameSize READ getGameSize WRITE setGameSize NOTIFY gameSizeChanged)
 
 public:
+	enum class Direction {
+		up, down, right, left
+	};
+	Q_ENUM(Direction)
+
 	explicit GameController(QObject* parent = nullptr);
 	quint32 getScore() const;
 	BoardModel* getBoard();
@@ -55,10 +60,12 @@ public:
 	void setInGame(bool);
 	quint8 getGameSize() const;
 	void setGameSize(quint8);
-	Q_INVOKABLE void move(quint8 towards);
+	Q_INVOKABLE void move(Direction towards);
 	Q_INVOKABLE void reset();
 	Q_INVOKABLE bool canMove();
 	Q_INVOKABLE void deleteTileAt(quint8 index);
+
+	static game2048::Direction directionToGameDirection(Direction);
 
 signals:
 	void scoreChanged();
