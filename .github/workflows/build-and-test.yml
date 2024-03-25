@@ -13,7 +13,7 @@ env:
 
 jobs:
   build-ubuntu:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v4
 
@@ -22,9 +22,10 @@ jobs:
         with:
           version: 6.6.2
           setup-python: false
+          cache: true
 
       - name: Configure CMake
-        run: cmake -B ${{ github.workspace }}/build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_TESTING=ON
+        run: cmake -B ${{ github.workspace }}/build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_CXX_COMPILER=g++-10 -DBUILD_TESTING=ON
 
       - name: Build
         run: cmake --build ${{ github.workspace }}/build --config ${{ env.BUILD_TYPE }}
@@ -33,11 +34,26 @@ jobs:
         working-directory: ${{ github.workspace }}/build
         run: ./bin/test_2048
 
+      - name: Run DeployQt
+        working-directory: ${{ github.workspace }}/build
+        run: |
+          rm -rf /home/runner/work/2048/Qt/6.6.2/gcc_64/plugins/sqldrivers
+          sudo apt install libfuse2 libxcb-cursor0
+          wget -c -nv https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage -O linuxdeployqt-continuous-x86_64.AppImage
+          chmod +x linuxdeployqt-continuous-x86_64.AppImage
+          mkdir -p app/usr/bin
+          cp bin/game app/usr/bin/2048
+          mkdir -p app/usr/share/icons/hicolor/256x256/apps
+          cp ${{ github.workspace }}/assets/logo.png app/usr/share/icons/hicolor/256x256/apps/2048.png
+          mkdir -p app/usr/share/applications
+          echo -e "[Desktop Entry]\nType=Application\nName=2048\nComment=2048 game made with qt\nExec=2048\nIcon=2048\nCategories=Game;" >> app/usr/share/applications/2048.desktop
+          ./linuxdeployqt-continuous-x86_64.AppImage app/usr/share/applications/2048.desktop -verbose=2 -appimage -qmldir=${{ github.workspace }}/qml
+
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
           name: 2048-ubuntu
-          path: ${{ github.workspace }}/build/bin/game
+          path: ${{ github.workspace }}/build/2048-*.AppImage
 
   build-windows:
     runs-on: windows-latest
@@ -60,8 +76,12 @@ jobs:
         working-directory: ${{ github.workspace }}/build
         run: ./bin/test_2048
 
+      - name: Run DeployQt
+        working-directory: ${{ github.workspace }}/build
+        run: windeployqt bin/game.exe --qmldir=${{ github.workspace }}/qml
+
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
-          name: 2048-windows.exe
-          path: ${{ github.workspace }}/build/bin/game.exe
+          name: 2048-windows
+          path: ${{ github.workspace }}/build/bin/
