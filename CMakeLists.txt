@@ -29,7 +29,15 @@ qt_add_qml_module(${APP_EXE}
             SaveController.cpp
             SaveController.h
         QML_FILES
-            Main.qml
+            qml/EndDialog.qml
+            qml/GameGrid.qml
+            qml/GameHeader.qml
+            qml/Main.qml
+            qml/MainMenu.qml
+            qml/ResetDialog.qml
+            qml/ScoresWindow.qml
+            qml/Tile.qml
+            qml/UndoDialog.qml
 )
 target_link_libraries(${APP_EXE} PUBLIC g2048 PRIVATE Qt6::Quick)
 
