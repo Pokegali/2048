@@ -4,6 +4,7 @@ import gameModule
 
 Rectangle {
     property alias shadow: shadow
+    property int spacing: 32 / GameController.gameSize
 
     id: grid
     Layout.alignment: Qt.AlignHCenter
@@ -23,8 +24,8 @@ Rectangle {
             height: gridSpaces.itemAt(index).height
             number: value
             width: gridSpaces.itemAt(index).width
-            x: gridSpaces.itemAt(index).x + 8
-            y: gridSpaces.itemAt(index).y + 8
+            x: gridSpaces.itemAt(index).x + spacing
+            y: gridSpaces.itemAt(index).y + spacing
             z: 1
 
             NumberAnimation on opacity  {
@@ -46,10 +47,10 @@ Rectangle {
     }
     GridLayout {
         anchors.fill: parent
-        anchors.margins: 8
-        columnSpacing: 8
+        anchors.margins: spacing
+        columnSpacing: spacing
         columns: GameController.gameSize
-        rowSpacing: 8
+        rowSpacing: spacing
         rows: GameController.gameSize
 
         Repeater {

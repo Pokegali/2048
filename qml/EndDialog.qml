@@ -35,6 +35,7 @@ Popup {
                 color: root.palette.text
                 focus: true
                 maximumLength: 30
+                enabled: GameController.gameSize == 4
 
                 validator: RegularExpressionValidator {
                     regularExpression: /.{3,30}/
@@ -46,10 +47,17 @@ Popup {
                 }
             }
         }
+        Text {
+            color: "red"
+            text: "Sorry, you can only save your score in 4×4"
+            visible: GameController.gameSize != 4
+            anchors.horizontalCenter: parent.horizontalCenter
+        }
         Button {
             id: saveButton
             anchors.horizontalCenter: parent.horizontalCenter
             text: "Save"
+            enabled: GameController.gameSize == 4
 
             onClicked: {
                 if (!usernameInput.acceptableInput) {

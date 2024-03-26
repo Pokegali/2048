@@ -50,7 +50,7 @@ Row {
             Text {
                 id: bestScoreLabel
                 anchors.horizontalCenter: parent.horizontalCenter
-                text: "Best score"
+                text: GameController.gameSize == 4 ? "Best score" : "Best Score 4×4"
             }
             Text {
                 anchors.bottom: parent.bottom

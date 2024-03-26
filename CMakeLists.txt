@@ -32,6 +32,7 @@ qt_add_qml_module(${APP_EXE}
             qml/EndDialog.qml
             qml/GameGrid.qml
             qml/GameHeader.qml
+            qml/GameSettingsDialog.qml
             qml/Main.qml
             qml/MainMenu.qml
             qml/ResetDialog.qml

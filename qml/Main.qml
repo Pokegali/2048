@@ -68,6 +68,9 @@ Window {
     UndoDialog {
         id: undoDialog
     }
+    GameSettingsDialog {
+        id: settings
+    }
     ScoresWindow {
         id: scores
     }

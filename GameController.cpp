@@ -14,6 +14,7 @@ void GameController::setInGame(bool status) {
 }
 
 void GameController::setGameSize(quint8 gameSize) {
+	if (gameSize > MAX_GAME_SIZE || gameSize < MIN_GAME_SIZE) { return; }
 	this->game = game2048::Game(gameSize);
 	emit gameSizeChanged();
 	this->reset();

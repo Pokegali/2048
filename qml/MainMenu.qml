@@ -4,7 +4,7 @@ MenuBar {
     Menu {
         title: "Game"
 
-        onClosed: mainColumn.forceActiveFocus()
+        onAboutToHide: mainColumn.forceActiveFocus()
 
         Action {
             text: "Best scores"
@@ -12,9 +12,9 @@ MenuBar {
             onTriggered: scores.show()
         }
         Action {
-            text: "Change board size"
+            text: "Change game settings"
 
-            onTriggered: console.log("change game size")
+            onTriggered: settings.open()
         }
         MenuSeparator {
         }

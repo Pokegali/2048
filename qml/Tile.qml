@@ -1,4 +1,5 @@
 import QtQuick
+import gameModule
 
 Rectangle {
     required property int number
@@ -20,7 +21,7 @@ Rectangle {
     Text {
         anchors.centerIn: parent
         font.bold: true
-        font.pointSize: 15
+        font.pointSize: 15 * 4 / GameController.gameSize
         text: number === 0 ? "" : String(1 << number)
     }
 }
