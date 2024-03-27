@@ -15,10 +15,12 @@ set_compiler_warnings(g2048)
 
 find_package(Qt6 REQUIRED COMPONENTS Quick Qml QuickControls2 QuickDialogs2 QuickLayouts QuickTemplates2)
 
-qt_standard_project_setup()
+qt_standard_project_setup(REQUIRES 6.5)
 set(APP_EXE game)
 
-qt_add_executable(${APP_EXE} main.cpp)
+qt_add_executable(${APP_EXE} main.cpp BoardModel.h BoardModel.cpp
+    Types.h)
+
 set_compiler_warnings(${APP_EXE})
 qt_add_qml_module(${APP_EXE}
         URI gameModule
@@ -39,6 +41,7 @@ qt_add_qml_module(${APP_EXE}
             qml/ScoresWindow.qml
             qml/Tile.qml
             qml/UndoDialog.qml
+            QML_FILES qml/GameButton.qml
 )
 target_link_libraries(${APP_EXE} PUBLIC g2048 PRIVATE Qt6::Quick)
 set_target_properties(${APP_EXE} PROPERTIES MACOSX_BUNDLE TRUE)

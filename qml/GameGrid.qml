@@ -3,13 +3,10 @@ import QtQuick.Layouts
 import gameModule
 
 Rectangle {
+    id: grid
     property alias shadow: shadow
     property int spacing: 32 / GameController.gameSize
 
-    id: grid
-    Layout.alignment: Qt.AlignHCenter
-    Layout.fillHeight: true
-    Layout.preferredWidth: grid.height
     color: "#b0b0b0"
     radius: 10
 
@@ -65,6 +62,39 @@ Rectangle {
             }
         }
     }
+    DragHandler {
+        property real lastHVelocity:0
+        property real lastVVelocity:0
+        target: null
+        xAxis.enabled: true
+        yAxis.enabled: true
+        onCentroidChanged: {
+            if ((centroid.position.x !== 0 || centroid.velocity.x !== 0) && (centroid.position.y !== 0 || centroid.velocity.y !== 0)) {
+                lastHVelocity = centroid.velocity.x
+                lastVVelocity = centroid.velocity.y
+                return
+            }
+            if (Math.abs(lastHVelocity) < 0.4 && Math.abs(lastVVelocity) < 0.4 )
+                return
+            if(Math.abs(lastHVelocity) > Math.abs(lastVVelocity))
+            {
+                if (lastHVelocity < 0) {
+                    GameController.move(GameController.Direction.left);
+                } else {
+                    GameController.move(GameController.Direction.right);
+                }
+            }
+            else
+            {
+                if (lastVVelocity < 0) {
+                    GameController.move(GameController.Direction.up);
+                } else {
+                    GameController.move(GameController.Direction.down);
+                }
+            }
+        }
+    }
+
     Rectangle {
         id: shadow
         anchors.fill: parent
@@ -73,4 +103,5 @@ Rectangle {
         visible: false
         z: 1
     }
+
 }

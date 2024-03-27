@@ -5,7 +5,7 @@ import gameModule
 
 Popup {
     id: endDialog
-    anchors.centerIn: parent
+
     closePolicy: Popup.CloseOnEscape
     focus: true
     modal: true

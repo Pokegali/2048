@@ -1,26 +1,29 @@
+import QtQuick
 import QtQuick.Controls
 
 MenuBar {
+    id: menu
+    width: parent.width
+
+    signal showScore();
+    signal openSettings();
     Menu {
         title: "Game"
-
         onAboutToHide: mainColumn.forceActiveFocus()
 
         Action {
             text: "Best scores"
 
-            onTriggered: scores.show()
+            onTriggered: menu.showScore()
         }
         Action {
             text: "Change game settings"
 
-            onTriggered: settings.open()
+            onTriggered: menu.openSettings()
         }
-        MenuSeparator {
-        }
+        MenuSeparator {}
         Action {
             text: "Quit"
-
             onTriggered: Qt.quit()
         }
     }

@@ -3,7 +3,7 @@ import QtQuick.Controls
 import gameModule
 
 Popup {
-    anchors.centerIn: parent
+    id: resetDialog
     closePolicy: Popup.CloseOnEscape
     focus: true
     modal: true
