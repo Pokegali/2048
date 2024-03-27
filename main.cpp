@@ -10,6 +10,6 @@ int main(int argc, char** argv)
     QObject::connect(
         &engine, &QQmlApplicationEngine::objectCreationFailed, &app, []() { QCoreApplication::exit(-1); },
         Qt::QueuedConnection);
-    engine.loadFromModule("Game", "Main");
+    engine.loadFromModule("gameModule", "Main");
     return QGuiApplication::exec();
 }
