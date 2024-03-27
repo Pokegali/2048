@@ -41,6 +41,7 @@ qt_add_qml_module(${APP_EXE}
             qml/ScoresWindow.qml
             qml/Tile.qml
             qml/UndoDialog.qml
+            QML_FILES qml/GameButton.qml
 )
 target_link_libraries(${APP_EXE} PUBLIC g2048 PRIVATE Qt6::Quick)
 set_target_properties(${APP_EXE} PROPERTIES MACOSX_BUNDLE TRUE)
