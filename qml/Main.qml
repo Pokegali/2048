@@ -1,8 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import Qt.labs.qmlmodels
-import Game
+import gameModule
 
 ApplicationWindow {
     id: root
@@ -24,15 +23,21 @@ ApplicationWindow {
         anchors.centerIn: parent
     }
 
+    ScoresWindow {
+        id: scores
+        anchors.centerIn: parent
+    }
+
+
     UndoDialog {// not used
         id: undoDialog
         anchors.centerIn: parent
     }
 
-    header: GameMenuBar {
+    header: MainMenu {
         id: menu
         onShowScore: {
-            scores.show()
+            scores.open()
         }
     }
 
@@ -66,7 +71,11 @@ ApplicationWindow {
             }
         }
 
-        GameHeader {}
+        GameHeader {
+            Layout.minimumHeight: root.height / 4
+            Layout.maximumHeight: root.height / 4
+            Layout.margins: 15
+        }
 
         GameGrid {
             id: grid
