@@ -1,12 +1,22 @@
 #include "GameController.h"
 
+namespace constants
+{
+constexpr auto maxGameSize{8};
+constexpr auto MinGameSize{2};
+} // namespace constants
+
 GameController::GameController(QObject* parent) : QObject(parent)
 {
     this->reset();
 }
 
-void GameController::setGameSize(quint8 gameSize) {
-	if (gameSize > MAX_GAME_SIZE || gameSize < MIN_GAME_SIZE) { return; }
+void GameController::setGameSize(quint8 gameSize)
+{
+    if(gameSize > constants::maxGameSize || gameSize < constants::MinGameSize)
+    {
+        return;
+    }
     this->game= game2048::Game(gameSize);
     emit gameSizeChanged();
     this->reset();
@@ -77,31 +87,11 @@ void GameController::setInGame(bool status)
     emit inGameChanged();
 }
 
-void GameController::setGameSize(quint8 gameSize)
-{
-    this->game= game2048::Game(gameSize);
-    emit gameSizeChanged();
-    this->reset();
-}
-
 game2048::Direction GameController::directionToGameDirection(Direction direction)
 {
     switch(direction)
     {
     case Direction::up:
-			this->board.startRemove(action.start_index);
-			this->board.edit(action.end_index, action.end_index, true);
-		} else if (action.spawned_number) {
-			this->board.append({action.start_index, action.spawned_number, false});
-		} else {
-			this->board.edit(action.start_index, action.end_index, false);
-		}
-	}
-	emit scoreChanged();
-}
-
-game2048::Direction GameController::directionToGameDirection(Direction direction) {
-	switch (direction) {
         return game2048::Direction::up;
     case Direction::down:
         return game2048::Direction::down;
@@ -120,80 +110,5 @@ bool GameController::canMove()
 
 void GameController::deleteTileAt(quint8 index)
 {
-   this->board.remove(index);
+    this->board.remove(index);
 }
-
-
-/*
-
-BoardModel::BoardModel(QObject* parent) : QAbstractListModel(parent) {}
-
-int BoardModel::rowCount(const QModelIndex& parent) const {
-	Q_UNUSED(parent)
-	return static_cast<int>(this->tiles.size());
-}
-
-QHash<int, QByteArray> BoardModel::roleNames() const {
-	static QHash<int, QByteArray> mapping {
-		{BoardIndexRole, "index"},
-		{BoardValueRole, "value"},
-		{BoardToDeleteRole, "toDelete"}
-	};
-	return mapping;
-}
-
-QVariant BoardModel::data(const QModelIndex& index, int role) const {
-	if (!index.isValid() || index.row() >= this->tiles.size()) { return {}; }
-	const Tile& tile = this->tiles[index.row()];
-	switch (role) {
-		case BoardIndexRole:
-			return static_cast<int>(tile.index);
-		case BoardValueRole:
-			return static_cast<int>(tile.value);
-		case BoardToDeleteRole:
-			return tile.toDelete;
-		default:
-			return {};
-	}
-}
-
-void BoardModel::append(const Tile& tile) {
-	int size = static_cast<int>(this->tiles.size());
-	this->beginInsertRows(QModelIndex(), size, size);
-	this->tiles.append(tile);
-	this->endInsertRows();
-}
-
-void BoardModel::remove(uint8_t index) {
-	const auto& tileIndex = this->getIndexInList(index, true);
-	this->beginRemoveRows(QModelIndex(), tileIndex, tileIndex);
-	this->tiles.removeAt(tileIndex);
-	this->endRemoveRows();
-}
-
-void BoardModel::startRemove(uint8_t index) {
-	const auto& tileIndex = this->getIndexInList(index);
-	this->tiles[tileIndex].toDelete = true;
-	QModelIndex qIndex = this->index(tileIndex);
-	emit this->dataChanged(qIndex, qIndex);
-}
-
-void BoardModel::edit(uint8_t oldIndex, uint8_t newIndex, bool valueIncrement) {
-	const auto& tileIndex = this->getIndexInList(oldIndex);
-	if (valueIncrement) { this->tiles[tileIndex].value++; }
-	this->tiles[tileIndex].index = newIndex;
-	QModelIndex qIndex = this->index(tileIndex);
-	emit this->dataChanged(qIndex, qIndex);
-}
-
-int BoardModel::getIndexInList(uint8_t tileIndex, bool toDelete) const {
-	return static_cast<int>(std::find_if(this->tiles.begin(), this->tiles.end(), [&tileIndex, &toDelete](const Tile& tile) { return tile.index == tileIndex && tile.toDelete == toDelete; }) - this->tiles.begin());
-}
-
-void BoardModel::reset() {
-	this->beginResetModel();
-	this->tiles.clear();
-	this->endResetModel();
-}
-
-*/

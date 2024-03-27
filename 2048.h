@@ -6,8 +6,9 @@
 
 namespace game2048
 {
-const double SPAWN_CHANCE_4= .25;
-const uint8_t CELLS_AT_START= 2;
+// move me to cpp file
+constexpr auto spawnChance4{.25};
+constexpr uint8_t cellAtStart{2};
 
 typedef std::vector<uint8_t> Board;
 enum class Direction
@@ -18,14 +19,13 @@ enum class Direction
     left
 };
 
-typedef struct GameAction
+struct GameAction
 {
     uint8_t start_index;
     uint8_t end_index;
     bool merged;
     uint8_t spawned_number;
-} GameAction;
-
+};
 
 class Game
 {
