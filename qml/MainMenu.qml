@@ -1,6 +1,13 @@
+import QtQuick
 import QtQuick.Controls
 
 MenuBar {
+    id: menu
+    signal openSettings
+    signal showScores
+
+    width: parent.width
+
     Menu {
         title: "Game"
 
@@ -9,12 +16,12 @@ MenuBar {
         Action {
             text: "Best scores"
 
-            onTriggered: scores.show()
+            onTriggered: menu.showScores()
         }
         Action {
             text: "Change game settings"
 
-            onTriggered: settings.open()
+            onTriggered: menu.openSettings()
         }
         MenuSeparator {
         }

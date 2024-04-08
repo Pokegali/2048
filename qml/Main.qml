@@ -1,8 +1,9 @@
 import QtQuick
+import QtQuick.Controls
 import QtQuick.Layouts
 import gameModule
 
-Window {
+ApplicationWindow {
     id: root
 
     property alias gameShadow: grid.shadow
@@ -14,21 +15,18 @@ Window {
     title: "2048"
     visible: true
 
-    MainMenu {
+    header: MainMenu {
         id: menu
-        width: parent.width
+        onShowScores: scores.show()
+        onOpenSettings: settings.open()
     }
+
     ColumnLayout {
         id: mainColumn
-        anchors.bottom: parent.bottom
-        anchors.left: parent.left
-        anchors.margins: 10
-        anchors.right: parent.right
-        anchors.top: menu.bottom
+        anchors.fill: parent
         focus: true
-        height: 500
-        spacing: 25
-        width: 500
+        spacing: 10
+        anchors.bottomMargin: 10
 
         Keys.onPressed: event => {
             switch (event.key) {
@@ -54,22 +52,34 @@ Window {
             }
         }
 
-        GameHeader {}
+        GameHeader {
+            Layout.margins: 15
+            Layout.maximumHeight: root.height / 4
+            Layout.minimumHeight: root.height / 4
+        }
         GameGrid {
             id: grid
+            Layout.alignment: Qt.AlignHCenter
+            Layout.fillHeight: true
+            Layout.preferredWidth: grid.height
         }
     }
+
     ResetDialog {
         id: resetDialog
+        anchors.centerIn: parent
     }
     EndDialog {
         id: endDialog
+        anchors.centerIn: parent
     }
     UndoDialog {
         id: undoDialog
+        anchors.centerIn: parent
     }
     GameSettingsDialog {
         id: settings
+        anchors.centerIn: parent
     }
     ScoresWindow {
         id: scores

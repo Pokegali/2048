@@ -5,11 +5,13 @@
 #include <vector>
 
 namespace game2048 {
-	const double SPAWN_CHANCE_4 = .25;
-	const uint8_t CELLS_AT_START = 2;
+	constexpr double SPAWN_CHANCE_4{.25};
+	constexpr uint8_t CELLS_AT_START{2};
 
 	typedef std::vector<uint8_t> Board;
-	enum class Direction { up, right, down, left };
+	enum class Direction {
+		up, right, down, left
+	};
 
 	typedef struct GameAction {
 		uint8_t start_index;
@@ -32,8 +34,8 @@ namespace game2048 {
 		uint8_t to_index(const uint8_t* pointer) const;
 
 	private:
-		Board board {};
-		std::vector<uint8_t*> rotated_board {};
+		Board board{};
+		std::vector<uint8_t*> rotated_board{};
 		unsigned int score = 0;
 		uint8_t size;
 		std::vector<GameAction> current_turn_actions;

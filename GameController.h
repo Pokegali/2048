@@ -5,37 +5,7 @@
 #include <QObject>
 #include <qqml.h>
 #include "2048.h"
-
-typedef struct Tile {
-	uint8_t index;
-	uint8_t value;
-	bool toDelete;
-} Tile;
-
-class BoardModel: public QAbstractListModel {
-	Q_OBJECT
-
-public:
-	enum BoardModelRoles: int {
-		BoardIndexRole,
-		BoardValueRole,
-		BoardToDeleteRole
-	};
-
-	explicit BoardModel(QObject* parent = nullptr);
-	int rowCount(const QModelIndex& parent) const override;
-	QVariant data(const QModelIndex& index, int role) const override;
-	QHash<int, QByteArray> roleNames() const override;
-	void append(const Tile& tile);
-	void startRemove(uint8_t index);
-	void remove(uint8_t index);
-	void edit(uint8_t oldIndex, uint8_t newIndex, bool valueIncrement);
-	void reset();
-	int getIndexInList(uint8_t tileIndex, bool toDelete = false) const;
-
-private:
-	QList<Tile> tiles;
-};
+#include "BoardModel.h"
 
 class GameController: public QObject {
 	Q_OBJECT
@@ -54,6 +24,7 @@ public:
 	enum class Direction {
 		up, down, right, left
 	};
+
 	Q_ENUM(Direction)
 
 	explicit GameController(QObject* parent = nullptr);
@@ -77,7 +48,7 @@ signals:
 
 private:
 	BoardModel board;
-	game2048::Game game {4};
+	game2048::Game game{4};
 	bool inGame = true;
 };
 

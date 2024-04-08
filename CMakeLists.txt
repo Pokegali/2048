@@ -5,9 +5,9 @@ set(ALL_WARNINGS -O2 -pedantic -Wall -Wextra -Wcast-align -Wcast-qual -Wctor-dto
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/bin)
 macro(set_compiler_warnings target)
-    if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
         target_compile_options(${target} PUBLIC ${ALL_WARNINGS})
-    endif()
+    endif ()
 endmacro()
 
 add_library(g2048 STATIC 2048.cpp 2048.h)
@@ -28,8 +28,12 @@ qt_add_qml_module(${APP_EXE}
             GameController.h
             SaveController.cpp
             SaveController.h
+            BoardModel.cpp
+            BoardModel.h
+            Types.h
         QML_FILES
             qml/EndDialog.qml
+            qml/GameButton.qml
             qml/GameGrid.qml
             qml/GameHeader.qml
             qml/GameSettingsDialog.qml
@@ -43,6 +47,6 @@ qt_add_qml_module(${APP_EXE}
 target_link_libraries(${APP_EXE} PUBLIC g2048 PRIVATE Qt6::Quick)
 set_target_properties(${APP_EXE} PROPERTIES MACOSX_BUNDLE TRUE)
 
-if(BUILD_TESTING)
+if (BUILD_TESTING)
     add_subdirectory(tests)
-endif()
+endif ()

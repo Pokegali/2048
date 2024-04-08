@@ -1,8 +1,6 @@
 #include "SaveController.h"
 
-SaveController::SaveController(QObject* parent):
-QObject(parent),
-settings(QSettings("Pokegali", "2048")) {
+SaveController::SaveController(QObject* parent): QObject(parent), settings(QSettings("Pokegali", "2048")) {
 	this->loadData();
 }
 
@@ -19,7 +17,10 @@ void SaveController::loadData() {
 	}
 	this->settings.endArray();
 	if (size != 0) {
-		auto bestScoreIterator = std::max_element(this->scores.begin(), this->scores.end(), [](const ScoreRecord& record1, const ScoreRecord& record2) { return record1.score < record2.score; });
+		auto bestScoreIterator= std::max_element(
+				this->scores.begin(), this->scores.end(),
+				[](const ScoreRecord& record1, const ScoreRecord& record2){ return record1.score < record2.score; }
+		);
 		this->updateBestScore(*bestScoreIterator);
 	}
 }
@@ -58,6 +59,7 @@ void SaveController::updateBestScore(const ScoreRecord& record) {
 
 QList<ScoreRecord> SaveController::getSortedScores() const {
 	QList<ScoreRecord> result = this->scores;
-	std::sort(result.begin(), result.end(), [](const ScoreRecord& record1, const ScoreRecord& record2) { return record1.score > record2.score; });
+	std::sort(result.begin(), result.end(),
+			  [](const ScoreRecord& record1, const ScoreRecord& record2) { return record1.score > record2.score; });
 	return result;
 }

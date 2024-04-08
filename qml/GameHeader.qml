@@ -3,110 +3,60 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import gameModule
 
-Row {
-    Layout.fillWidth: true
-    Layout.minimumHeight: root.height / 4
-    spacing: 15
+GridLayout {
+    columns: 3
+    columnSpacing: 10
+    rowSpacing: 5
 
-    Rectangle {
-        color: "yellow"
-        height: parent.height
-        radius: 20
-        width: parent.height
+    Label {
+        Layout.fillHeight: true
+        Layout.preferredWidth: height
+        Layout.rowSpan: 2
+        font.pointSize: 20
+        text: "2048"
+        color: "black"
+        horizontalAlignment: Label.AlignHCenter
+        verticalAlignment: Label.AlignVCenter
 
-        Text {
-            anchors.centerIn: parent
-            font.pointSize: 20
-            text: "2048"
+        background: Rectangle {
+            color: "yellow"
+            radius: 20
         }
     }
-    GridLayout {
-        columns: 2
-        height: parent.height
-        rows: 2
-        width: parent.width - parent.height - 10
-
-        Rectangle {
-            Layout.fillHeight: true
-            Layout.fillWidth: true
-
-            Text {
-                id: scoreLabel
-                anchors.horizontalCenter: parent.horizontalCenter
-                text: "Score"
-            }
-            Text {
-                anchors.bottom: parent.bottom
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.top: scoreLabel.bottom
-                font.pointSize: 15
-                text: GameController.score.toLocaleString(Qt.locale("fr_FR"), "f", 0)
-            }
-        }
-        Rectangle {
-            Layout.fillHeight: true
-            Layout.fillWidth: true
-
-            Text {
-                id: bestScoreLabel
-                anchors.horizontalCenter: parent.horizontalCenter
-                text: GameController.gameSize == 4 ? "Best score" : "Best Score 4×4"
-            }
-            Text {
-                anchors.bottom: parent.bottom
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.top: bestScoreLabel.bottom
-                font.pointSize: 15
-                text: SaveController.bestScore.toLocaleString(Qt.locale("fr_FR"), "f", 0)
-            }
-        }
-        Button {
-            id: resetButton
-            Layout.fillHeight: true
-            Layout.fillWidth: true
-            Layout.maximumHeight: parent.height / 2
-            activeFocusOnTab: false
-            text: "Reset"
-
-            background: Rectangle {
-                color: resetButton.down ? "#a81717" : "#be2121"
-                opacity: enabled ? 1 : .3
-                radius: 10
-            }
-            contentItem: Text {
-                color: "black"
-                elide: Text.ElideRight
-                horizontalAlignment: Text.AlignHCenter
-                opacity: enabled ? 1 : .3
-                text: resetButton.text
-                verticalAlignment: Text.AlignVCenter
-            }
-
-            onClicked: resetDialog.open()
-        }
-        Button {
-            id: undoButton
-            Layout.fillHeight: true
-            Layout.fillWidth: true
-            Layout.maximumHeight: parent.height / 2
-            activeFocusOnTab: false
-            text: "Undo"
-
-            background: Rectangle {
-                color: undoButton.down ? "#a87a17" : "#be9c21"
-                opacity: enabled ? 1 : .3
-                radius: 10
-            }
-            contentItem: Text {
-                color: "black"
-                elide: Text.ElideRight
-                horizontalAlignment: Text.AlignHCenter
-                opacity: enabled ? 1 : .3
-                text: undoButton.text
-                verticalAlignment: Text.AlignVCenter
-            }
-
-            onClicked: undoDialog.open()
-        }
+    Label {
+        Layout.preferredWidth: 500
+        Layout.fillHeight: true
+        Layout.fillWidth: true
+        font.pointSize: 14
+        horizontalAlignment: Label.AlignHCenter
+        text: "Score<br/><strong>%1</strong>".arg(GameController.score.toLocaleString(Qt.locale("fr_FR"), "f", 0))
+        textFormat: Label.RichText
+    }
+    Label {
+        Layout.preferredWidth: 500
+        Layout.fillHeight: true
+        Layout.fillWidth: true
+        font.pointSize: 14
+        horizontalAlignment: Label.AlignHCenter
+        text: "Best score %1<br/><strong>%2</strong>".arg(GameController.gameSize === 4 ? "" : "4×4").arg(SaveController.bestScore.toLocaleString(Qt.locale("fr_FR"), "f", 0))
+        textFormat: Label.RichText
+    }
+    GameButton {
+        id: resetButton
+        Layout.fillHeight: true
+        Layout.fillWidth: true
+        colorOne: "#a81717"
+        colorTwo: "#be2121"
+        text: "Reset"
+        onClicked: resetDialog.open()
+    }
+    GameButton {
+        id: undoButton
+        Layout.fillHeight: true
+        Layout.fillWidth: true
+        colorOne: "#a87a17"
+        colorTwo: "#be9c21"
+        text: "Undo"
+        onClicked: undoDialog.open()
     }
 }
