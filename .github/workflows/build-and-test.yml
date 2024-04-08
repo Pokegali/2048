@@ -111,7 +111,7 @@ jobs:
         working-directory: ${{ github.workspace }}/build/bin
         run: |
           mv game.app 2048.app
-          macdeployqt 2048.app -qmldir=${{ github.workspace }}/qml -dmg
+          macdeployqt 2048.app -qmldir=${{ github.workspace }}/qml -dmg -verbose=2
 
       - name: Upload
         uses: actions/upload-artifact@v4
